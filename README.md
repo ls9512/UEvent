@@ -54,7 +54,7 @@ Unity : 2017+
 
 ###  1.2. <a name='-1'></a>文件
 * **Example** 例程文件夹，实际项目中可删除以减小空间占用。
-* **Script / Core** 文件夹，完全 .Net 实现的核心功能kk部分，可在 .Net 环境下独立使用。
+* **Script / CSharp** 文件夹，完全 .Net 实现的核心功能kk部分，可在 .Net 环境下独立使用。
 * **Script / Unity** 文件夹，依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
 
 ###  1.3. <a name='-1'></a>特性
