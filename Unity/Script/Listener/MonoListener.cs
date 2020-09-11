@@ -36,11 +36,18 @@ namespace Aya.Events
         protected virtual void Awake()
         {
             EventListener = new EventListener(this);
+            if (!ListenEventOnlyActive)
+            {
+                EventListener.Register();
+            }
         }
 
         protected virtual void OnEnable()
         {
-            EventListener.Register();
+            if (ListenEventOnlyActive)
+            {
+                EventListener.Register();
+            }
         }
 
         protected virtual void OnDisable()

@@ -1,6 +1,6 @@
 ﻿# UPlugins / UEvent 
 
-**UEvent** 是一个可以使用在Unity和原生.Net环境下的通用事件模块。
+**UEvent** 是一个可以使用在Unity和原生.Net环境下的通用消息事件组件，通过事件机制可以提供强大的解耦能力。
 
 ![topLanguage](https://img.shields.io/github/languages/top/ls9512/UEvent)
 ![size](https://img.shields.io/github/languages/code-size/ls9512/UEvent)
@@ -49,8 +49,8 @@
 <!-- /vscode-markdown-toc -->
 ##  1. <a name=''></a>简介
 ###  1.1. <a name='-1'></a>环境
-Unity : 2017+
-.Net : 4.x+
+* Unity : 2017+
+* .Net : 4.x+
 
 ###  1.2. <a name='-1'></a>文件
 * **Example** 例程文件夹，实际项目中可删除以减小空间占用。
