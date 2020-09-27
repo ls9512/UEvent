@@ -16,9 +16,14 @@ namespace Aya.Events
     public class EventHandler<T> : EventHandler
     {
         /// <summary>
+        /// 间厅委托
+        /// </summary>
+        public Action<T> ActionT1 { get; set; }
+
+        /// <summary>
         /// 监听委托
         /// </summary>
-        public Action<T, object[]> Action { get; set; }
+        public Action<T, object[]> ActionT2 { get; set; }
 
         /// <summary>
         /// 执行事件
@@ -27,7 +32,7 @@ namespace Aya.Events
         /// <returns>执行结果</returns>
         public override bool Invoke(params object[] args)
         {
-            if (Action != null)
+            if (ActionT2 != null)
             {
                 var result = InvokeAction(this, args);
                 return result;
@@ -41,22 +46,38 @@ namespace Aya.Events
         /// <summary>
         /// 执行监听委托
         /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="eventHandler">监听事件数据</param>
         /// <param name="args">事件参数</param>
         /// <returns>执行结果</returns>
         internal static bool InvokeAction(EventHandler<T> eventHandler, params object[] args)
         {
-            var action = eventHandler.Action;
-            if (action == null) return false;
-            try
+            var actionT1 = eventHandler.ActionT1;
+            if (actionT1 != null)
             {
-                action((T) eventHandler.Type, args);
+                try
+                {
+                    actionT1((T) eventHandler.Type);
+                }
+                catch (Exception exception)
+                {
+                    EventInterface.OnError(exception);
+                    return false;
+                }
             }
-            catch (Exception exception)
+            else
             {
-                UnityEngine.Debug.LogError(exception);
-                return false;
+                var actionT2 = eventHandler.ActionT2;
+                if (actionT2 == null) return false;
+                try
+                {
+                    actionT2((T) eventHandler.Type, args);
+                }
+                catch (Exception exception)
+                {
+                    EventInterface.OnError(exception);
+                    return false;
+                }
             }
 
             return true;

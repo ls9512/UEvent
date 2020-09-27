@@ -46,10 +46,64 @@ namespace Aya.Events
         #region Add Listener
 
         /// <summary>
+        /// 添加监听委托<para/>
+        /// 无需指定对象
+        /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
+        /// <param name="eventType">事件类型</param>
+        /// <param name="action">监听委托</param>
+        /// <param name="group">监听分组</param>
+        /// <param name="priority">优先级</param>
+        /// <param name="interrupt">是否中断事件队列</param>
+        /// <returns>监听事件数据</returns>
+        public EventHandler AddListener<T>(T eventType, Action action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = _createEventHandler(eventType, action, group, priority, interrupt);
+            _cacheEventHandler(eventType, eventHandler);
+            return eventHandler;
+        }
+
+        /// <summary>
+        /// 添加监听委托<para/>
+        /// 无需指定对象
+        /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
+        /// <param name="eventType">事件类型</param>
+        /// <param name="action">监听委托</param>
+        /// <param name="group">监听分组</param>
+        /// <param name="priority">优先级</param>
+        /// <param name="interrupt">是否中断事件队列</param>
+        /// <returns>监听事件数据</returns>
+        public EventHandler AddListener<T>(T eventType, Action<T> action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = _createEventHandler(eventType, action, group, priority, interrupt);
+            _cacheEventHandler(eventType, eventHandler);
+            return eventHandler;
+        }
+
+        /// <summary>
+        /// 添加监听委托<para/>
+        /// 无需指定对象
+        /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
+        /// <param name="eventType">事件类型</param>
+        /// <param name="action">监听委托</param>
+        /// <param name="group">监听分组</param>
+        /// <param name="priority">优先级</param>
+        /// <param name="interrupt">是否中断事件队列</param>
+        /// <returns>监听事件数据</returns>
+        public EventHandler AddListener<T>(T eventType, Action<T, object[]> action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = _createEventHandler(eventType, action, group, priority, interrupt);
+            _cacheEventHandler(eventType, eventHandler);
+            return eventHandler;
+        }
+
+        /// <summary>
         /// 添加监听方法<para/>
         /// 需要指定对象
         /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="eventType">事件类型</param>
         /// <param name="target">目标对象</param>
         /// <param name="method">监听方法</param>
@@ -59,86 +113,24 @@ namespace Aya.Events
         /// <returns>监听事件数据</returns>
         public EventHandler AddListener<T>(T eventType, object target, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
         {
-            var handler = new EventHandler<T>
-            {
-                Type = eventType,
-                Target = target,
-                Group = group,
-                Method = method,
-                Parameters = method.GetParameters(),
-                Action = _createDelegateFromMethodInfo<T>(target, method),
-                Priority = priority,
-                Interrupt = interrupt,
-            };
-
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            if (priority != 0 && !handlerGroup.NeedSort)
-            {
-                handlerGroup.NeedSort = true;
-            }
-
-            handlerGroup.Handlers.Add(handler);
-            if (handlerGroup.NeedSort)
-            {
-                handlerGroup.SortEvents();
-            }
-
-            return handler;
-        }
-
-        /// <summary>
-        /// 添加监听委托<para/>
-        /// 无需指定对象
-        /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
-        /// <param name="eventType">事件类型</param>
-        /// <param name="action">监听委托</param>
-        /// <param name="group">监听分组</param>
-        /// <param name="priority">优先级</param>
-        /// <param name="interrupt">是否中断事件队列</param>
-        /// <returns>监听事件数据</returns>
-        public EventHandler<T> AddListener<T>(T eventType, Action<T, object[]> action, object group = null, int priority = 0, bool interrupt = false)
-        {
-            var handler = new EventHandler<T>
-            {
-                Type = eventType,
-                Target = null,
-                Group = group,
-                Method = null,
-                Parameters = null,
-                Action = action,
-                Priority = priority,
-                Interrupt = interrupt
-            };
-
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            if (priority != 0 && !handlerGroup.NeedSort)
-            {
-                handlerGroup.NeedSort = true;
-            }
-
-            handlerGroup.Handlers.Add(handler);
-            if (handlerGroup.NeedSort)
-            {
-                handlerGroup.SortEvents();
-            }
-
-            return handler;
+            var eventHandler = _createEventHandler(eventType, target, method, group, priority, interrupt);
+            _cacheEventHandler(eventType, eventHandler);
+            return eventHandler;
         }
 
         #endregion
 
-        #region Has Listener
+        #region  Contains Listener
 
         /// <summary>
         /// 是否包含指定类型事件的监听器
         /// </summary>
         /// <param name="eventType">事件类型</param>
         /// <returns>结果</returns>
-        public bool HasListener(object eventType)
+        public bool ContainsListener<T>(T eventType)
         {
             var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var result = handlerGroup != null && handlerGroup.Handlers.Count > 0;
+            var result = handlerGroup.Handlers.Count > 0;
             return result;
         }
 
@@ -151,7 +143,7 @@ namespace Aya.Events
         /// </summary>
         /// <param name="eventType">事件类型</param>
         /// <returns>监听事件数据列表</returns>
-        public List<EventHandler> GetListeners(object eventType)
+        public List<EventHandler> GetListeners<T>(T eventType)
         {
             var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
             var handlers = handlerGroup.Handlers;
@@ -164,7 +156,7 @@ namespace Aya.Events
         /// <param name="eventType">事件类型</param>
         /// <param name="target">目标对象</param>
         /// <returns>监听事件数据列表</returns>
-        public List<EventHandler> GetListeners(object eventType, object target)
+        public List<EventHandler> GetListeners<T>(T eventType, object target)
         {
             var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
             var handlers = handlerGroup.Handlers;
@@ -186,21 +178,21 @@ namespace Aya.Events
         #region Remove Listener
 
         /// <summary>
-        /// 移除某个监听对象的指定方法的监听
+        /// 移除监听
         /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="eventType">事件类型</param>
-        /// <param name="target">监听对象</param>
-        /// <param name="method">监听方法</param>
-        public void RemoveListener(object eventType, object target, MethodInfo method)
+        /// <param name="action">监听委托</param>
+        public void RemoveListener<T>(T eventType, Action action)
         {
             var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var handlers = handlerGroup.Handlers;
-            for (var i = handlers.Count - 1; i >= 0; i--)
+            var eventHandlers = handlerGroup.Handlers;
+            for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
-                var eventData = handlers[i];
-                if (eventData.Target == null || (eventData.Target.Equals(target) && eventData.Method.Equals(method)))
+                var eventHandler = eventHandlers[i];
+                if (eventHandler.Action.Equals(action))
                 {
-                    handlers.Remove(eventData);
+                    eventHandlers.Remove(eventHandler);
                 }
             }
         }
@@ -208,7 +200,27 @@ namespace Aya.Events
         /// <summary>
         /// 移除监听
         /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
+        /// <typeparam name="T">事件类型</typeparam>
+        /// <param name="eventType">事件类型</param>
+        /// <param name="action">监听委托</param>
+        public void RemoveListener<T>(T eventType, Action<T> action)
+        {
+            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var handlers = handlerGroup.Handlers;
+            for (var i = handlers.Count - 1; i >= 0; i--)
+            {
+                if (!(handlers[i] is EventHandler<T> eventHandler)) continue;
+                if (eventHandler.ActionT1.Equals(action))
+                {
+                    handlers.Remove(eventHandler);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除监听
+        /// </summary>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="eventType">事件类型</param>
         /// <param name="action">监听委托</param>
         public void RemoveListener<T>(T eventType, Action<T, object[]> action)
@@ -217,10 +229,30 @@ namespace Aya.Events
             var handlers = handlerGroup.Handlers;
             for (var i = handlers.Count - 1; i >= 0; i--)
             {
-                if (!(handlers[i] is EventHandler<T> eventData)) continue;
-                if (eventData.Action.Equals(action))
+                if (!(handlers[i] is EventHandler<T> eventHandler)) continue;
+                if (eventHandler.ActionT2.Equals(action))
                 {
-                    handlers.Remove(eventData);
+                    handlers.Remove(eventHandler);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除某个监听对象的指定方法的监听
+        /// </summary>
+        /// <param name="eventType">事件类型</param>
+        /// <param name="target">监听对象</param>
+        /// <param name="method">监听方法</param>
+        public void RemoveListener<T>(T eventType, object target, MethodInfo method)
+        {
+            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var eventHandlers = handlerGroup.Handlers;
+            for (var i = eventHandlers.Count - 1; i >= 0; i--)
+            {
+                var eventHandler = eventHandlers[i];
+                if (eventHandler.Target == null || (eventHandler.Target.Equals(target) && eventHandler.Method.Equals(method)))
+                {
+                    eventHandlers.Remove(eventHandler);
                 }
             }
         }
@@ -356,18 +388,94 @@ namespace Aya.Events
 
         #region Private
 
+        private EventHandler _createEventHandler<T>(T eventType, Action action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = new EventHandler
+            {
+                Type = eventType,
+                Target = null,
+                Group = group,
+                Priority = priority,
+                Interrupt = interrupt,
+                Action = action,
+            };
+
+            return eventHandler;
+        }
+
+        private EventHandler _createEventHandler<T>(T eventType, Action<T> action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = new EventHandler<T>
+            {
+                Type = eventType,
+                Target = null,
+                Group = group,
+                Priority = priority,
+                Interrupt = interrupt,
+                ActionT1 = action,
+            };
+
+            return eventHandler;
+        }
+
+        private EventHandler _createEventHandler<T>(T eventType, Action<T, object[]> action, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = new EventHandler<T>
+            {
+                Type = eventType,
+                Target = null,
+                Group = group,
+                Priority = priority,
+                Interrupt = interrupt,
+                ActionT2 = action,
+            };
+
+            return eventHandler;
+        }
+
+        private EventHandler _createEventHandler<T>(T eventType, object target, MethodInfo methodInfo, object group = null, int priority = 0, bool interrupt = false)
+        {
+            var eventHandler = new EventHandler
+            {
+                Type = eventType,
+                Target = target,
+                Group = group,
+                Priority = priority,
+                Interrupt = interrupt,
+                Method = methodInfo,
+                Parameters = methodInfo.GetParameters(),
+            };
+
+            return eventHandler;
+        }
+
+        private void _cacheEventHandler<T>(T eventType, EventHandler eventHandler)
+        {
+            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            if (eventHandler.Priority != 0 && !handlerGroup.NeedSort)
+            {
+                handlerGroup.NeedSort = true;
+            }
+
+            handlerGroup.Handlers.Add(eventHandler);
+            if (handlerGroup.NeedSort)
+            {
+                handlerGroup.SortEvents();
+            }
+        }
+
         /// <summary>
         /// 尝试从方法信息创建出委托
         /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="target">目标</param>
-        /// <param name="method">方法信息</param>
+        /// <param name="methodInfo">方法信息</param>
         /// <returns>委托</returns>
-        private Action<T, object[]> _createDelegateFromMethodInfo<T>(object target, MethodInfo method)
+        private Action<T, object[]> _createDelegateFromMethodInfo<T>(object target, MethodInfo methodInfo)
         {
             try
             {
-                var del = Delegate.CreateDelegate(typeof(Action<T, object[]>), target, method);
+                var del = Delegate.CreateDelegate(typeof(Action<T, object[]>), target, methodInfo);
                 var action = del as Action<T, object[]>;
                 return action;
             }
@@ -380,20 +488,20 @@ namespace Aya.Events
         /// <summary>
         /// 尝试从字典获取对象，如不存在则添加
         /// </summary>
-        /// <typeparam name="T">事件枚举类型</typeparam>
+        /// <typeparam name="T">事件类型</typeparam>
         /// <param name="dic">事件缓存字典</param>
-        /// <param name="eventType">事件类型值</param>
+        /// <param name="eventData">事件类型值</param>
         /// <returns>结果</returns>
-        private static EventHandlerGroup _getOrAddHandlerGroup<T>(IDictionary<object, EventHandlerGroup> dic, T eventType)
+        private static EventHandlerGroup _getOrAddHandlerGroup<T>(IDictionary<object, EventHandlerGroup> dic, T eventData)
         {
-            if (eventType == null) return null;
+            var eventType = typeof(T);
             if (dic.TryGetValue(eventType, out var ret))
             {
                 return ret;
             }
             else
             {
-                ret = new EventHandlerGroup(typeof(T), eventType);
+                ret = new EventHandlerGroup(eventType, eventData);
                 dic.Add(eventType, ret);
                 return ret;
             }

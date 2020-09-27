@@ -11,7 +11,7 @@
 
 namespace Aya.Events
 {
-    public partial interface IEventHandler 
+    public partial interface IEventHandler
     {
         /// <summary>
         /// 事件类型

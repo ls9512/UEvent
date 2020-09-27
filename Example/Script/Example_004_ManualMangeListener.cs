@@ -12,24 +12,26 @@ namespace Aya.Example
     {
         public void Test()
         {
+            // Quick API
+
             // Add listen method
             var listenMethod = this.GetType().GetMethod("ListenMethod");
-            AddListener(EventType004.Event01, listenMethod);
+            UEvent.Listen(EventType004.Event01, this, listenMethod);
 
             // Add listen action
-            AddListener(EventType004.Event01, ListenAction);
+            UEvent.Listen(EventType004.Event01, ListenAction);
 
             // Check listener exists
-            HasListener(EventType004.Event01);
-
+            UEvent.Contains(EventType004.Event01);
+            
             // Get listeners
-            var listeners = GetListeners(EventType004.Event01);
-
+            var listeners = UEvent.Get(EventType004.Event01);
+            
             // Remove listen method
-            RemoveListener(EventType004.Event01, listenMethod);
+            UEvent.Remove(EventType004.Event01, this, listenMethod);
 
             // Remove listen action
-            RemoveListener(EventType004.Event01, ListenAction);
+            UEvent.Remove(EventType004.Event01, ListenAction);
         }
 
         public void ListenMethod()
@@ -47,6 +49,8 @@ namespace Aya.Example
     {
         public void Test()
         {
+            // Full API
+
             // Add listen method
             var listenMethod = this.GetType().GetMethod("ListenMethod");
             EventManager.GetDispatcher<EventType004>().AddListener(EventType004.Event01, this, listenMethod);
@@ -55,7 +59,7 @@ namespace Aya.Example
             EventManager.GetDispatcher<EventType004>().AddListener(EventType004.Event01, ListenAction);
 
             // Check listener exists
-            EventManager.GetDispatcher<EventType004>().HasListener(EventType004.Event01);
+            EventManager.GetDispatcher<EventType004>().ContainsListener(EventType004.Event01);
 
             // Get listeners
             var listeners = EventManager.GetDispatcher<EventType004>().GetListeners(EventType004.Event01, this);

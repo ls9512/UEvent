@@ -42,6 +42,11 @@ namespace Aya.Events
         public bool Interrupt { get; set; }
 
         /// <summary>
+        /// 监听委托
+        /// </summary>
+        public Action Action { get; set; }
+
+        /// <summary>
         /// 监听方法
         /// </summary>
         public MethodInfo Method { get; set; }
@@ -58,9 +63,40 @@ namespace Aya.Events
         /// <returns>执行结果</returns>
         public virtual bool Invoke(params object[] args)
         {
-            if (Method == null) return false;
-            var result = InvokeMethod(this, args);
+            var result = false;
+            if (Action != null)
+            {
+                result = InvokeAction(this);
+            }
+            else if (Method != null)
+            {
+                result = InvokeMethod(this, args);
+            }
+
             return result;
+        }
+
+        /// <summary>
+        /// 执行监听委托
+        /// </summary>
+        /// <param name="eventHandler">监听事件数据</param>
+        /// <returns>执行结果</returns>
+        internal static bool InvokeAction(EventHandler eventHandler)
+        {
+            var action = eventHandler.Action;
+            if (action == null) return false;
+
+            try
+            {
+                action.Invoke();
+            }
+            catch (Exception exception)
+            {
+                EventInterface.OnError(exception);
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -125,7 +161,7 @@ namespace Aya.Events
             }
             catch (Exception exception)
             {
-                UnityEngine.Debug.LogError(exception);
+                EventInterface.OnError(exception);
                 return false;
             }
 

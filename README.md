@@ -41,6 +41,7 @@
 	* 4.9. [发送事件 (Unity线程安全)](#Unity)
 	* 4.10. [发送事件到对象](#-1)
 	* 4.11. [发送事件到分组](#-1)
+	* 4.12. [Full API](#FullAPI)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -227,39 +228,47 @@ public void TestMethod()
 ###  4.7. <a name='-1'></a>手动注册/注销事件
 ``` cs
 // 添加监听
-EventManager.GetDispatcher<T>().AddListener(eventType, this, method, group, priority, interrupt);
-EventManager.GetDispatcher<T>().AddListener(eventType, action, group, priority, interrupt);
+UEvent.Listen<T>(eventType, this, methodInfo, group, priorty, interrupt);
+UEvent.Listen<T>(eventType, action, group, priorty, interrupt);
 
 // 是否包含监听
-EventManager.GetDispatcher<T>().HasListener(eventType);
+UEvent.Contains<T>()(eventType);
 
 // 获取监听
-EventManager.GetDispatcher<T>().GetListeners(eventType);
-EventManager.GetDispatcher<T>().GetListeners(eventType, target);
+UEvent.Get(eventType);
+UEvent.Get(eventType, target);
 
 // 移除监听
-EventManager.GetDispatcher<T>().RemoveListener(eventType, this, method);
-EventManager.GetDispatcher<T>().RemoveListener(eventType, action);
+UEvent.Remove(eventType, this, method);
+UEvent.Remove(eventType, action);
 ```
 
 ###  4.8. <a name='-1'></a>发送事件
 ``` cs
-EventManager.GetDispatcher<T>().Dispatch(eventType, args);
+UEvent.Dispatch(eventType, args);
 ```
 
 ###  4.9. <a name='Unity'></a>发送事件 (Unity线程安全)
 ``` cs
 // 该接口会将事件以委托形式转交给Unity主线程执行，仅Unity扩展中可用。
-EventManager.GetDispatcher<T>().DispatchSafe(eventType, args);
+UEvent.DispatchSafe(eventType, args);
 ```
 
 ###  4.10. <a name='-1'></a>发送事件到对象
 ``` cs
-EventManager.GetDispatcher<T>().DispatchTo(eventType, target, args);
+UEvent.DispatchTo(eventType, target, args);
 ```
 
 ###  4.11. <a name='-1'></a>发送事件到分组
 ``` cs
 // `Group` 参数如果为空，则等效为调用 `Dispatch` 接口，事件将发送给任何没有分组的监听方法。
-EventManager.GetDispatcher<T>().DispatchGroup(eventType, group, args);
+UEvent.DispatchGroup(eventType, group, args);
+```
+
+###  4.12. <a name='FullAPI'></a>Full API
+如果想获得 **UEvent** 的完整功能或调用内部接口，则可以通过使用以下方式访问调用，接口与上文提到的快速调用接口略有差异，通过 **EventManager** 先获取到对应事件的 **EventDispatcher**，再调用具体内部接口，例如：
+``` cs
+EventManager.GetDispatcher<T>().AddListener<T>(eventType, action, group, priorty, interrupt);
+
+EventManager.GetDispatcher<T>().RemoveListener<T>(eventType, action);
 ```

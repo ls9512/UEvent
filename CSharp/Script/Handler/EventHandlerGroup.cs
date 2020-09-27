@@ -14,10 +14,10 @@ using System.Collections.Generic;
 namespace Aya.Events
 {
     [Serializable]
-    public class EventHandlerGroup
+    public struct EventHandlerGroup
     {
         /// <summary>
-        /// 事件枚举类型
+        /// 事件类型
         /// </summary>
         public Type Type { get; }
 
@@ -39,7 +39,7 @@ namespace Aya.Events
         /// <summary>
         /// 是否需要排序
         /// </summary>
-        public bool NeedSort { get; internal set; } = false;
+        public bool NeedSort { get; internal set; }
 
         /// <summary>
         /// 构造方法
@@ -51,6 +51,7 @@ namespace Aya.Events
             Type = type;
             EventType = eventType;
             Handlers = new List<EventHandler>();
+            NeedSort = false;
         }
 
         /// <summary>

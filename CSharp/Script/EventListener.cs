@@ -19,14 +19,14 @@ namespace Aya.Events
         #region Property
 
         /// <summary>
-        /// 事件监听对象
-        /// </summary>
-        public object Listener { get; }
-
-        /// <summary>
         /// 监听对象类型 - 监听方法 - 包含监听事件类型列表
         /// </summary>
         protected static Dictionary<Type, Dictionary<MethodInfo, List<object>>> MethodMap = new Dictionary<Type, Dictionary<MethodInfo, List<object>>>();
+
+        /// <summary>
+        /// 事件监听对象
+        /// </summary>
+        public object Listener { get; }
 
         /// <summary>
         /// 事件分发器注册列表
@@ -55,7 +55,8 @@ namespace Aya.Events
             // 如果该类型对象已经被注册过，则直接遍历该类型所有需要监听的方法并注册到事件分发器
             if (MethodMap.ContainsKey(objType))
             {
-                foreach (var kv in MethodMap[objType])
+                var tempObjEventDic = MethodMap[objType];
+                foreach (var kv in tempObjEventDic)
                 {
                     var method = kv.Key;
                     var eventTypeList = kv.Value;
@@ -70,15 +71,19 @@ namespace Aya.Events
             }
 
             // 如果是未注册过的对象类型，则遍历所有被标记需要监听的方法，进行注册
-            MethodMap.Add(objType, new Dictionary<MethodInfo, List<object>>());
+            var objEventDic = new Dictionary<MethodInfo, List<object>>();
+            MethodMap.Add(objType, objEventDic);
             var methods = objType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
             for (var i = 0; i < methods.Length; i++)
             {
                 var method = methods[i];
                 var attrs = method.GetCustomAttributes(typeof(Attribute), false);
                 if (attrs.Length <= 0) continue;
-                MethodMap[objType].Add(method, new List<object>());
-                var eventList = MethodMap[objType][method];
+
+                var eventList = new List<object>();
+                objEventDic.Add(method, eventList);
+
                 for (var j = 0; j < attrs.Length; j++)
                 {
                     var attrTemp = attrs[j];
@@ -134,6 +139,15 @@ namespace Aya.Events
             }
 
             RegisteredDispatchers.Clear();
+        }
+
+        /// <summary>
+        /// 更新注册信息
+        /// </summary>
+        public void UpdateRegister()
+        {
+            DeRegister();
+            Register();
         }
 
         #endregion
