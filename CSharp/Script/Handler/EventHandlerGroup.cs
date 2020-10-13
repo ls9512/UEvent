@@ -14,7 +14,7 @@ using System.Collections.Generic;
 namespace Aya.Events
 {
     [Serializable]
-    public struct EventHandlerGroup
+    public class EventHandlerGroup
     {
         /// <summary>
         /// 事件类型

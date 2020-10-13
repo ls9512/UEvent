@@ -11,7 +11,7 @@
 
 namespace Aya.Events
 {
-    public abstract partial class ObjectListener : IEventListener
+    public abstract partial class ObjectListener
     {
         #region Property
 

@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Aya.Events
 {
-    public abstract class MonoListener : MonoBehaviour, IEventListener
+    public abstract class MonoListener : MonoBehaviour
     {
         #region Property
         

@@ -14,7 +14,7 @@ using System.Reflection;
 namespace Aya.Events
 {
     [Serializable]
-    public class EventHandler : IEventHandler
+    public class EventHandler
     {
         /// <summary>
         /// 事件类型
