@@ -1,4 +1,4 @@
-﻿# UPlugins / UEvent 
+﻿# UEvent 
 
 **UEvent** 是一个可以使用在Unity和原生.Net环境下的通用消息事件组件，通过事件机制可以提供强大的解耦能力。
 
@@ -42,6 +42,10 @@
 	* 4.10. [发送事件到对象](#-1)
 	* 4.11. [发送事件到分组](#-1)
 	* 4.12. [Full API](#FullAPI)
+* 5. [兼容性功能](#-1)
+	* 5.1. [兼容性列表](#-1)
+	* 5.2. [string 类型事件](#string)
+	* 5.3. [class / struct 类型事件](#classstruct)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -57,9 +61,11 @@
 * **Example** 例程文件夹，实际项目中可删除以减小空间占用。
 * **Script / CSharp** 文件夹，完全 .Net 实现的核心功能kk部分，可在 .Net 环境下独立使用。
 * **Script / Unity** 文件夹，依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
+* **Script / * / Ext** 文件夹，用来兼容 string / class / struct 类型事件的临时实现代码，以后可能被替换。
 
 ###  1.3. <a name='-1'></a>特性
 * 支持通过枚举定义多组事件，按单一事件或者按事件类型进行监听。
+* 同时支持 enum / string / class / struct 类型的事件定义最小化改动兼容不同项目。
 * 支持监听接收事件优先级。
 * 支持事件分组发送或者针对特定目标对象发送。
 * 支持特定监听器中断整个监听事件队列。
@@ -72,12 +78,14 @@
 * 事件监听器外部实现 **UserEventListener**
 
 ###  1.5. <a name='-1'></a>约定
-* 每一种类型的事件，使用一种枚举类型比如: `AppEvent`, `GameEvent` 等等，每种事件类型会对应一个 事件分发器 实例。
+* 每一种类型的事件，使用一种枚举类型比如: AppEvent, GameEvent 等等，每种事件类型会对应一个 事件分发器 实例。
 * 可以每个项目只使用一种事件类型，但不推荐。
 * 方法型监听需要指定绑定对象，而委托型监听不需要指定对象。
-* 委托类型的监听方法，参数使用通用的 `object[]` 形式，因而需要指定 `eventType` 来进行处理，所以委托强制约定格式为 `Action<T, object[]>`。
+* 委托类型的监听方法，参数使用通用的 **object[]** 形式，因而需要指定 **eventType** 来进行处理，所以委托强制约定格式为 **Action<T, object[]>**。
 * 推荐通过多个事件枚举来对事件进行分组，通过监听分组特性来对监听方法进行分组。
-* 当接受事件的方法第一个参数名为 `eventType` 时，会自动发送事件类型，其他参数依次后移。可用于处理需要区分多个事件触发同一方法的情况。
+* 当接受事件的方法第一个参数名为 **eventType** 时，会自动发送事件类型，其他参数依次后移。可用于处理需要区分多个事件触发同一方法的情况。
+* **enum** / **string** 类型事件使用 **UEvent** 接口，**class** / **struct** 类型事件使用 **UEvent\<T\>** 接口，接口没有做完整的类型约束，但请务必按照约定调用以避免不可预期的问题。
+* 尽管同时支持多种类型的事件，但任然强烈建议在一个项目中只使用一种类型的事件格式。
 
 ###  1.6. <a name='-1'></a>接入
 将 `Events` 文件夹整个放入 `UnityProject/Assets/Plugins/` 目录下即可。
@@ -154,9 +162,14 @@
 
 ###  4.1. <a name='-1'></a>事件定义
 ``` cs
+/* 
+UEvent 推荐使用枚举类型定义事件，通过不同的枚举实现事件分组功能。
+如果需要使用 string / class / struct 类型定义事件，详见 `兼容性功能` 部分
+*/
+
 // EventEnumAttributte 为预留标签，暂无功能
 [EventEnum]
-public enum GameEvent
+public enum GameEventType
 {
 	GameStart,
 	GameFinish,
@@ -271,4 +284,72 @@ UEvent.DispatchGroup(eventType, group, args);
 EventManager.GetDispatcher<T>().AddListener<T>(eventType, action, group, priorty, interrupt);
 
 EventManager.GetDispatcher<T>().RemoveListener<T>(eventType, action);
+```
+
+***
+
+##  5. <a name='-1'></a>兼容性功能
+###  5.1. <a name='-1'></a>兼容性列表
+为了兼容各种项目中已有的事件类型定义方式，提供了对 string / class / struct 类型事件的部分支持，可以实现事件的自动/手动绑定和事件发送等基本功能，但也会失去部分功能，详见功能支持列表：
+
+|功能|支持|
+|---|---|
+|自动/手动监听|√|
+|发送事件|√|
+|监听优先级|√|
+|监听队列中断|√|
+|定义分组分类|×|
+|监听分组 **ListenGroupAttribute**|√|
+|监听同类型事件 **ListenTypeAttribute**|×|
+
+###  5.2. <a name='string'></a>string 类型事件
+``` cs
+// 定义
+public static class StringEventDefine
+{
+    public const string Event01 = "Event01";
+    public const string Event02 = "Event02";
+}
+
+// 监听
+UEvent.Listen(StringEventDefine.Event01, Receive);
+
+// 发送
+UEvent.Dispatch(StringEventDefine.Event01, "Message");
+
+// 移除
+UEvent.Remove(StringEventDefine.Event01, Receive);
+
+// 接收
+public void Receive02(string message)
+{
+    Console.WriteLine(message);
+}
+```
+
+###  5.3. <a name='classstruct'></a>class / struct 类型事件
+``` cs
+// 定义
+public class ClassEventDefine
+{
+    public string Message;
+}
+
+// 监听
+UEvent<ClassEventDefine>.Listen(Receive);
+
+// 发送
+UEvent<ClassEventDefine>.Dispatch(new ClassEventDefine()
+{
+	Message = "Message"
+});
+
+// 移除
+UEvent<ClassEventDefine>.Remove(Receive);
+
+// 接收
+public void Receive(ClassEventDefine evt)
+{
+	Console.WriteLine(evt.Message);
+}
 ```
