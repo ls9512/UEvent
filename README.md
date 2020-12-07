@@ -1,6 +1,6 @@
 ﻿# UEvent 
 
-**UEvent** 是一个可以使用在Unity和原生.Net环境下的通用消息事件组件，通过事件机制可以提供强大的解耦能力。
+**UEvent** is a general message event component that can be used in unity and native .Net environment. It can provide powerful decoupling capability through event mechanism.
 
 ![topLanguage](https://img.shields.io/github/languages/top/ls9512/UEvent)
 ![size](https://img.shields.io/github/languages/code-size/ls9512/UEvent)
@@ -9,165 +9,167 @@
 ![last](https://img.shields.io/github/last-commit/ls9512/UEvent)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
+[[中文文档]](README_CN.md)
+
 <!-- vscode-markdown-toc -->
-* 1. [简介](#)
-	* 1.1. [环境](#-1)
-	* 1.2. [文件](#-1)
-	* 1.3. [特性](#-1)
-	* 1.4. [结构](#-1)
-	* 1.5. [约定](#-1)
-	* 1.6. [接入](#-1)
-* 2. [组件](#-1)
-	* 2.1. [事件管理器 EventManager](#EventManager)
-	* 2.2. [事件分发器 EventDispatcher](#EventDispatcher)
-	* 2.3. [事件监听器 EventListener](#EventListener)
-	* 2.4. [Object 事件监听器 ObjectListener](#ObjectObjectListener)
-	* 2.5. [Unity MonoBehaviour 事件监听器 MonoListener](#UnityMonoBehaviourMonoListener)
-	* 2.6. [监听事件处理器 EventHander](#EventHander)
-* 3. [可选特性标签 Attribute](#Attribute)
-	* 3.1. [事件定义枚举 EventEnumAttribute](#EventEnumAttribute)
-	* 3.2. [事件监听 ListenAttribute](#ListenAttribute)
-	* 3.3. [类型监听 ListenTypeAttribute](#ListenTypeAttribute)
-	* 3.4. [监听分组 ListenGroupAttribute](#ListenGroupAttribute)
+* 1. [Introduction](#Introduction)
+	* 1.1. [Environment](#Environment)
+	* 1.2. [Folder](#Folder)
+	* 1.3. [Feature](#Feature)
+	* 1.4. [Structure](#Structure)
+	* 1.5. [Rules / Recommendations](#RulesRecommendations)
+	* 1.6. [Start](#Start)
+* 2. [Component](#Component)
+	* 2.1. [Event Manager](#EventManager)
+	* 2.2. [Event Dispatcher](#EventDispatcher)
+	* 2.3. [Event Listener](#EventListener)
+	* 2.4. [Object  Listener](#ObjectListener)
+	* 2.5. [Unity MonoListener](#UnityMonoListener)
+	* 2.6. [Event Handler](#EventHandler)
+* 3. [Optional Attribute](#OptionalAttribute)
+	* 3.1. [ EventEnumAttribute](#EventEnumAttribute)
+	* 3.2. [ListenAttribute](#ListenAttribute)
+	* 3.3. [ListenTypeAttribute](#ListenTypeAttribute)
+	* 3.4. [ListenGroupAttribute](#ListenGroupAttribute)
 * 4. [API](#API)
-	* 4.1. [事件定义](#-1)
-	* 4.2. [自动监听器](#-1)
-	* 4.3. [手动监听器](#-1)
-	* 4.4. [监听事件](#-1)
-	* 4.5. [监听类型](#-1)
-	* 4.6. [监听分组](#-1)
-	* 4.7. [手动注册/注销事件](#-1)
-	* 4.8. [发送事件](#-1)
-	* 4.9. [发送事件 (Unity线程安全)](#Unity)
-	* 4.10. [发送事件到对象](#-1)
-	* 4.11. [发送事件到分组](#-1)
+	* 4.1. [Event Definition](#EventDefinition)
+	* 4.2. [Auto Listener](#AutoListener)
+	* 4.3. [Manual Listener](#ManualListener)
+	* 4.4. [Listen Event](#ListenEvent)
+	* 4.5. [Listen Event Type](#ListenEventType)
+	* 4.6. [Listen Group](#ListenGroup)
+	* 4.7. [Maunal Register / Deregister Event](#MaunalRegisterDeregisterEvent)
+	* 4.8. [Dispatch Event](#DispatchEvent)
+	* 4.9. [Dispatch Event (Thread Safety for Unity)](#DispatchEventThreadSafetyforUnity)
+	* 4.10. [Dispatch to Target](#DispatchtoTarget)
+	* 4.11. [Dispatch to Group](#DispatchtoGroup)
 	* 4.12. [Full API](#FullAPI)
-* 5. [兼容性功能](#-1)
-	* 5.1. [兼容性列表](#-1)
-	* 5.2. [string 类型事件](#string)
-	* 5.3. [class / struct 类型事件](#classstruct)
+* 5. [Compatibility Features](#CompatibilityFeatures)
+	* 5.1. [Compatibility List](#CompatibilityList)
+	* 5.2. [string Event](#stringEvent)
+	* 5.3. [class / struct Event](#classstructEvent)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
 	autoSave=true
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
-##  1. <a name=''></a>简介
-###  1.1. <a name='-1'></a>环境
+##  1. <a name='Introduction'></a>Introduction
+###  1.1. <a name='Environment'></a>Environment
 * Unity : 2017+
 * .Net : 4.x+
 
-###  1.2. <a name='-1'></a>文件
-* **Example** 例程文件夹，实际项目中可删除以减小空间占用。
-* **Script / CSharp** 文件夹，完全 .Net 实现的核心功能kk部分，可在 .Net 环境下独立使用。
-* **Script / Unity** 文件夹，依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
-* **Script / * / Ext** 文件夹，用来兼容 string / class / struct 类型事件的临时实现代码，以后可能被替换。
+###  1.2. <a name='Folder'></a>Folder
+* **Example**: Example folder. It can be deleted in the you project to reduce space consumption.
+* **Script / CSharp**: The core fully implemented by .Net, can be used independently in .Net environment.
+* **Script / Unity**:  The additional functions implemented by unity class library, you need to work with the code in the core folder when working in unity environment.
+* **Script / * / Ext**: Temporary implementation code for compatibility with string / class / struct type events, which may be replaced later.
 
-###  1.3. <a name='-1'></a>特性
-* 支持通过枚举定义多组事件，按单一事件或者按事件类型进行监听。
-* 同时支持 enum / string / class / struct 类型的事件定义最小化改动兼容不同项目。
-* 支持监听接收事件优先级。
-* 支持事件分组发送或者针对特定目标对象发送。
-* 支持特定监听器中断整个监听事件队列。
-* 同时支持普通方法和委托形式的事件。
-* 提供 `ObjectListener` 和 `MonoListener` 基类，使任何类获得自动注册/移除监听的特性，也可以自行实现 `IEventListener` 接口。
+###  1.3. <a name='Feature'></a>Feature
+* Support to define multiple groups of events through enumeration, and monitor by single event or by event type.
+* At the same time, it supports enum / string / class / struct type event definition to minimize changes and be compatible with different projects.
+* Support receiving event priority.
+* Support event grouping or sending for specific target objects.
+* Support specific listener to interrupt the entire listen event queue.
+* It also supports common methods and delegated methods.
+* Provide the `ObjectListener` and `MonoListener` base classes, so that any class can automatically register/remove listeners, and you can also implement the `IEventListener` interface yourself.
 
-###  1.4. <a name='-1'></a>结构
-* 事件管理器 **EventManager** -> 事件分发器 **EventDispatcher**-> 事件处理器 **EventHandler**
-* 事件监听器内部实现 **EventListener** -> 事件分发器 **EventDispatcher**
-* 事件监听器外部实现 **UserEventListener**
+###  1.4. <a name='Structure'></a>Structure
+* **EventManager** -> **EventDispatcher**-> **EventHandler**
+* Internal implementation : **EventListener** -> **EventDispatcher**
+* External implementation : **UserEventListener**
 
-###  1.5. <a name='-1'></a>约定
-* 每一种类型的事件，使用一种枚举类型比如: AppEvent, GameEvent 等等，每种事件类型会对应一个 事件分发器 实例。
-* 可以每个项目只使用一种事件类型，但不推荐。
-* 方法型监听需要指定绑定对象，而委托型监听不需要指定对象。
-* 委托类型的监听方法，参数使用通用的 **object[]** 形式，因而需要指定 **eventType** 来进行处理，所以委托强制约定格式为 **Action<T, object[]>**。
-* 推荐通过多个事件枚举来对事件进行分组，通过监听分组特性来对监听方法进行分组。
-* 当接受事件的方法第一个参数名为 **eventType** 时，会自动发送事件类型，其他参数依次后移。可用于处理需要区分多个事件触发同一方法的情况。
-* **enum** / **string** 类型事件使用 **UEvent** 接口，**class** / **struct** 类型事件使用 **UEvent\<T\>** 接口，接口没有做完整的类型约束，但请务必按照约定调用以避免不可预期的问题。
-* 尽管同时支持多种类型的事件，但任然强烈建议在一个项目中只使用一种类型的事件格式。
+###  1.5. <a name='RulesRecommendations'></a>Rules / Recommendations
+* For each type of event, use an enumerated type such as AppEvent, GameEvent, etc. Each event type corresponds to an event dispatcher instance.
+* It is possible to use only one event type per project, but it is not recommended.
+* Method-type listener needs to specify the binding object, while delegate-type listener does not need to specify the object.
+* For the listen method of the delegate type, the parameters use the general **object[]** form, so **eventType** needs to be specified for processing, so the mandatory convention format of the delegate is **Action<T, object[]>**.
+* It is recommended to group events through multiple event enumerations, and group monitoring methods through the **ListenGroupAttribute**.
+* When the first parameter of the method that receives the event is named **eventType**, the event type is automatically sent, and the other parameters are shifted backward in turn. It can be used to handle situations where multiple events trigger the same method.
+* **enum** / **string** type events use the **UEvent** interface, **class** / **struct** type events use the **UEvent\<T\>** interface, the interface does not do Complete type constraints, but be sure to call in accordance with the convention to avoid unexpected problems.
+* Although multiple types of events are supported at the same time, it is still strongly recommended to use only one type of event format in a project.
 
-###  1.6. <a name='-1'></a>接入
-将 `Events` 文件夹整个放入 `UnityProject/Assets/Plugins/` 目录下即可。
+###  1.6. <a name='Start'></a>Start
+Copy `Events` folder into `UnityProject/Assets/Plugins/`.
 
 ***
 
-##  2. <a name='-1'></a>组件
+##  2. <a name='Component'></a>Component
 
-###  2.1. <a name='EventManager'></a>事件管理器 EventManager
-用于管理所有的事件分发器。
+###  2.1. <a name='EventManager'></a>Event Manager
+Used to manage all event dispatchers.
 
-###  2.2. <a name='EventDispatcher'></a>事件分发器 EventDispatcher
-用于管理指定一种事件类型的监听注册/移除和事件分发。
+###  2.2. <a name='EventDispatcher'></a>Event Dispatcher
+Used to manage listener registration/de-registeration and event dispatcher for a specific event type.
 
-###  2.3. <a name='EventListener'></a>事件监听器 EventListener
-用于管理指定一个对象的事件监听注册/反注册。
+###  2.3. <a name='EventListener'></a>Event Listener
+Used to manage the event listener registration/de-registration of a specified object.
 
-###  2.4. <a name='ObjectObjectListener'></a>Object 事件监听器 ObjectListener
-普通类型通过继承该类或者使用自身初始化该类来实现事件机制，可以对该对象自动进行注册、反注册，同时提供快捷调用的监听注册、移除、事件分发接口。
+###  2.4. <a name='ObjectListener'></a>Object  Listener
+The user class implements the event mechanism by inheriting the class or initializing the class by itself, which can automatically register and de-register the object, and provide quick-call listener registration, removal, and event distribution interfaces.
 
-###  2.5. <a name='UnityMonoBehaviourMonoListener'></a>Unity MonoBehaviour 事件监听器 MonoListener
+###  2.5. <a name='UnityMonoListener'></a>Unity MonoListener
 与 ObjectListener 接口相同，提供给 MonoBehaviour 游戏对象使用。
 
-###  2.6. <a name='EventHander'></a>监听事件处理器 EventHander
-* **Type** : 事件类型
-* **Group** : 监听分组
-* **Target** : 事件目标对象，可空
-* **Priority** : 优先级
-* **Interrupt** : 是否中断事件队列
-* **Method** : 监听方法
-* **Parameters** ：监听方法的参数
-* **Action<T, object[]>** : 监听委托
+###  2.6. <a name='EventHandler'></a>Event Handler
+* **Type** : Event type
+* **Group** : Listen Group
+* **Target** : Event target / receiver
+* **Priority** : Priority
+* **Interrupt** : Interrupt event queue
+* **Method** : Listen method
+* **Parameters** ：Listen method's parameters
+* **Action<T, object[]>** : Listen delegate method
 
 ***
 
-##  3. <a name='Attribute'></a>可选特性标签 Attribute
+##  3. <a name='OptionalAttribute'></a>Optional Attribute
 
-###  3.1. <a name='EventEnumAttribute'></a>事件定义枚举 EventEnumAttribute
-该特性标签为预留功能，后期可能用于反射自动获取分散于不同程序集中的事件定义，目前暂无功能。
-###  3.2. <a name='ListenAttribute'></a>事件监听 ListenAttribute
-用于标记该类型内需要监听指定事件的方法。
-事件监听器会自动搜索所有包含该特性的方法，进行监听注册。
-* **属性**
-   * **Type** : 事件类型
-   * **Priority** : 优先级
-   * **Interrupt** : 是否中断事件队列
-* **注意事项**
-   * 优先级不限制取值范围，根据项目实际需要自行控制，设置非0的值后，将由高到低触发事件
-   * 可以标记监听多个事件
-   * 必须是实例对象
-   * 必须是非静态方法
+###  3.1. <a name='EventEnumAttribute'></a> EventEnumAttribute
+This attribute is a reserved function, and it may be used to automatically acquire event definitions scattered in different assemblies by reflection in the later stage. Currently, it has no function.
+###  3.2. <a name='ListenAttribute'></a>ListenAttribute
+It is used to mark the method that needs to listen the specified event in class.
+The event listener will automatically search for all methods containing this attribute and register for listen.
+* **Property**
+   * **Type** : Event type
+   * **Priority** : Priority
+   * **Interrupt** : Interrupt event queue
+* **Attention**
+   * Priority does not limit the value range, and controls itself according to the actual needs of the project. After setting a non-zero value, the event will be triggered from high to low.
+   * You can mark to listen to multiple events.
+   * Must be an instance object.
+   * Must be a non-static method.
 
-###  3.3. <a name='ListenTypeAttribute'></a>类型监听 ListenTypeAttribute
-加上该标记的方法能够接收指定事件类型的所有事件，会遍历所有枚举并注册所有监听
-* **属性**
-   * **Type** : 事件枚举类型
-   * **Priority** : 优先级
-   * **Interrupt** : 是否中断事件队列
+###  3.3. <a name='ListenTypeAttribute'></a>ListenTypeAttribute
+The method with this attribute can receive all events of the specified event type, traverse all enumerations and register all listeners.
+* **Property**
+   * **Type** : Event enum type
+   * **Priority** : Priority
+   * **Interrupt** : Interrupt event queue
 
-###  3.4. <a name='ListenGroupAttribute'></a>监听分组 ListenGroupAttribute
-只有通过 `DispatchGroup` 接口发送的事件，与该特性标签中的分组对应时才会触发事件。
-* **属性**
-   * **Type** : 事件类型
-   * **Group** : 事件分组
-   * **Priority** : 优先级
-   * **Interrup**t : 是否中断事件队列
-*  **注意事项**
-   * 使用其他特性标签添加的监听默认是没有分组的。
-   * 分组如果为空则等效于 `ListenAttribute`，可以接受来自任何无分组的同一事件的监听。
+###  3.4. <a name='ListenGroupAttribute'></a>ListenGroupAttribute
+The event will only be triggered when the event sent through the `DispatchGroup` interface corresponds to the group in the attribute tag.
+* **Property**
+   * **Type** : Event type
+   * **Group** : Event group type
+   * **Priority** : Priority
+   * **Interrup**t : Interrupt event queue
+*  **Attention**
+   * Monitors added using other attribute tags are not grouped by default.
+   * If the group is empty, it is equivalent to `ListenAttribute`, and it can accept listeners from any same event without a group.
 
 ***
 
 ##  4. <a name='API'></a>API
 
-###  4.1. <a name='-1'></a>事件定义
+###  4.1. <a name='EventDefinition'></a>Event Definition
 ``` cs
 /* 
-UEvent 推荐使用枚举类型定义事件，通过不同的枚举实现事件分组功能。
-如果需要使用 string / class / struct 类型定义事件，详见 `兼容性功能` 部分
+UEvent recommends using enumeration types to define events, and implement event grouping functions through different enumerations.
+If you need to use string / class / struct types to define events, see the `Compatibility Features` section for details.
 */
 
-// EventEnumAttributte 为预留标签，暂无功能
+// EventEnumAttributte is a reserved label and has no function temporarily.
 [EventEnum]
 public enum GameEventType
 {
@@ -176,53 +178,53 @@ public enum GameEventType
 }
 ```
 
-###  4.2. <a name='-1'></a>自动监听器
+###  4.2. <a name='AutoListener'></a>Auto Listener
 ``` cs
-// 任意 C# 类获得监听能力
+// Any C# class gains monitoring capabilities.
 public class TestClass : EventListener
 {
 }
 
-// 拥有监听能力的 Unity MonoBehaviour 对象
+// Unity MonoBehaviour object with listen capabilities.
 public class UnityTestClass : MonoEventListener
 {
 }
 ```
 
-###  4.3. <a name='-1'></a>手动监听器
+###  4.3. <a name='ManualListener'></a>Manual Listener
 ``` cs
-// 生成指定对象的监听器，一般对象生成时执行
+// Generate a listener for the specified object, executed when the general object is generated.
 var listener = new EventListener(this);
 
-// 注册该监听器的所有监听方法，一般在对象生效时执行
+// Register all the listening methods of the listener, generally executed when the object takes effect.
 EventListener.Register();
 
-// 注销所有监听方法，一般在对象失效时执行
+// Unregister all listening methods, generally executed when the object fails.
 EventListener.DeRegister();
 ```
 
-###  4.4. <a name='-1'></a>监听事件
+###  4.4. <a name='ListenEvent'></a>Listen Event
 ``` cs
-// 监听单个事件，无优先级
+// Listen to a single event, no priority.
 [Listen(GameEvent.GameStart)]
 public void TestMethod()
 {
 }
 
-// 监听单个事件，设置优先级和中断
+// Listen to a single event, set priority and interrupt.
 [Listen(GameEvent.GameStart, 2, false)]
 public void TestMethod()
 {
 }
 
-// 监听多个事件，无优先级
+// Monitor multiple events, no priority.
 [Listen(GameEvent.GameStart, GameEvent.GameEnd)]
 public void TestMethod()
 {
 }
 ```
 
-###  4.5. <a name='-1'></a>监听类型
+###  4.5. <a name='ListenEventType'></a>Listen Event Type
 ``` cs
 [ListenType(typeof(GameEvent))]
 public void TestMethod()
@@ -230,7 +232,7 @@ public void TestMethod()
 }
 ```
 
-###  4.6. <a name='-1'></a>监听分组
+###  4.6. <a name='ListenGroup'></a>Listen Group
 ``` cs
 [ListenGroup(GameEvent.GameStart, "Player")]
 public void TestMethod()
@@ -238,48 +240,48 @@ public void TestMethod()
 }
 ```
 
-###  4.7. <a name='-1'></a>手动注册/注销事件
+###  4.7. <a name='MaunalRegisterDeregisterEvent'></a>Maunal Register / Deregister Event
 ``` cs
-// 添加监听
+// Add listener
 UEvent.Listen<T>(eventType, this, methodInfo, group, priorty, interrupt);
 UEvent.Listen<T>(eventType, action, group, priorty, interrupt);
 
-// 是否包含监听
+// Whether to include listener
 UEvent.Contains<T>()(eventType);
 
-// 获取监听
+// Get listener with event type and target.
 UEvent.Get(eventType);
 UEvent.Get(eventType, target);
 
-// 移除监听
+// Remove listener
 UEvent.Remove(eventType, this, method);
 UEvent.Remove(eventType, action);
 ```
 
-###  4.8. <a name='-1'></a>发送事件
+###  4.8. <a name='DispatchEvent'></a>Dispatch Event
 ``` cs
 UEvent.Dispatch(eventType, args);
 ```
 
-###  4.9. <a name='Unity'></a>发送事件 (Unity线程安全)
+###  4.9. <a name='DispatchEventThreadSafetyforUnity'></a>Dispatch Event (Thread Safety for Unity)
 ``` cs
-// 该接口会将事件以委托形式转交给Unity主线程执行，仅Unity扩展中可用。
+// This interface will delegate events to the Unity main thread for execution, only available in Unity extensions.
 UEvent.DispatchSafe(eventType, args);
 ```
 
-###  4.10. <a name='-1'></a>发送事件到对象
+###  4.10. <a name='DispatchtoTarget'></a>Dispatch to Target
 ``` cs
 UEvent.DispatchTo(eventType, target, args);
 ```
 
-###  4.11. <a name='-1'></a>发送事件到分组
+###  4.11. <a name='DispatchtoGroup'></a>Dispatch to Group
 ``` cs
-// `Group` 参数如果为空，则等效为调用 `Dispatch` 接口，事件将发送给任何没有分组的监听方法。
+// If the `Group` parameter is empty, it is equivalent to calling the `Dispatch` interface, and the event will be sent to any listener method without a group.
 UEvent.DispatchGroup(eventType, group, args);
 ```
 
 ###  4.12. <a name='FullAPI'></a>Full API
-如果想获得 **UEvent** 的完整功能或调用内部接口，则可以通过使用以下方式访问调用，接口与上文提到的快速调用接口略有差异，通过 **EventManager** 先获取到对应事件的 **EventDispatcher**，再调用具体内部接口，例如：
+If you want to get the complete function of **UEvent** or call the internal interface, you can call it by using the following methods. The interface is slightly different from the quick call interface mentioned above. You can get **EventDispatcher** first through **EventManager**, then call the specific internal interface, for example:
 ``` cs
 EventManager.GetDispatcher<T>().AddListener<T>(eventType, action, group, priorty, interrupt);
 
@@ -288,66 +290,66 @@ EventManager.GetDispatcher<T>().RemoveListener<T>(eventType, action);
 
 ***
 
-##  5. <a name='-1'></a>兼容性功能
-###  5.1. <a name='-1'></a>兼容性列表
-为了兼容各种项目中已有的事件类型定义方式，提供了对 string / class / struct 类型事件的部分支持，可以实现事件的自动/手动绑定和事件发送等基本功能，但也会失去部分功能，详见功能支持列表：
+##  5. <a name='CompatibilityFeatures'></a>Compatibility Features
+###  5.1. <a name='CompatibilityList'></a>Compatibility List
+In order to be compatible with the existing event type definition methods in various projects, partial support for string / class / struct type events is provided, which can realize basic functions such as automatic/manual binding and event sending, but some functions will also be lost , See the function support list for details:
 
-|功能|支持|
+|Function|Support|
 |---|---|
-|自动/手动监听|√|
-|发送事件|√|
-|监听优先级|√|
-|监听队列中断|√|
-|定义分组分类|×|
-|监听分组 **ListenGroupAttribute**|√|
-|监听同类型事件 **ListenTypeAttribute**|×|
+|Auto / Manual listen|√|
+|Send event|√|
+|Listen priority|√|
+|Interrupt event queue|√|
+|Event group type|×|
+|Listen group **ListenGroupAttribute**|√|
+|Listen event group type **ListenTypeAttribute**|×|
 
-###  5.2. <a name='string'></a>string 类型事件
+###  5.2. <a name='stringEvent'></a>string Event
 ``` cs
-// 定义
+// Define event type
 public static class StringEventDefine
 {
-    public const string Event01 = "Event01";
-    public const string Event02 = "Event02";
+	public const string Event01 = "Event01";
+	public const string Event02 = "Event02";
 }
 
-// 监听
+// Register listener
 UEvent.Listen(StringEventDefine.Event01, Receive);
 
-// 发送
+// Dispatch event
 UEvent.Dispatch(StringEventDefine.Event01, "Message");
 
-// 移除
+// Remove listener
 UEvent.Remove(StringEventDefine.Event01, Receive);
 
-// 接收
-public void Receive02(string message)
+// Receive method
+public void Receive(string message)
 {
     Console.WriteLine(message);
 }
 ```
 
-###  5.3. <a name='classstruct'></a>class / struct 类型事件
+###  5.3. <a name='classstructEvent'></a>class / struct Event
 ``` cs
-// 定义
+// Define event type
 public class ClassEventDefine
 {
-    public string Message;
+	public string Message;
 }
 
-// 监听
+// Register listener
 UEvent<ClassEventDefine>.Listen(Receive);
 
-// 发送
+// Dispatch event
 UEvent<ClassEventDefine>.Dispatch(new ClassEventDefine()
 {
 	Message = "Message"
 });
 
-// 移除
+// Remove listener
 UEvent<ClassEventDefine>.Remove(Receive);
 
-// 接收
+// Receive method
 public void Receive(ClassEventDefine evt)
 {
 	Console.WriteLine(evt.Message);
