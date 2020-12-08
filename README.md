@@ -109,7 +109,7 @@ Used to manage the event listener registration/de-registration of a specified ob
 The user class implements the event mechanism by inheriting the class or initializing the class by itself, which can automatically register and de-register the object, and provide quick-call listener registration, removal, and event distribution interfaces.
 
 ###  2.5. <a name='UnityMonoListener'></a>Unity MonoListener
-与 ObjectListener 接口相同，提供给 MonoBehaviour 游戏对象使用。
+Same as ObjectListener's interface，uesd for MonoBehaviour GameObject.
 
 ###  2.6. <a name='EventHandler'></a>Event Handler
 * **Type** : Event type
