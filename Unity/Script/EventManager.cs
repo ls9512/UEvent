@@ -7,8 +7,6 @@
 //
 //  Tip      : 用于创建、获取事件分发器和发送事件
 //
-//  Copyright : Aya Game Studio 2020
-//
 /////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Collections.Generic;

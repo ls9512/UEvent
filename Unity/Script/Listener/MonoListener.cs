@@ -5,8 +5,6 @@
 //  Author   : ls9512
 //  E-mail   : ls9512@vip.qq.com
 //
-//  Copyright : Aya Game Studio 2019
-//
 /////////////////////////////////////////////////////////////////////////////
 using UnityEngine;
 
