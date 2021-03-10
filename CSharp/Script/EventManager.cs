@@ -20,7 +20,7 @@ namespace Aya.Events
         /// <summary>
         /// 事件枚举的类型 - 事件分发器 字典
         /// </summary>
-        private static readonly Dictionary<Type, EventDispatcher> DispatcherDic;
+        internal static readonly Dictionary<Type, EventDispatcher> DispatcherDic;
 
         #endregion
 

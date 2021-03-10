@@ -53,6 +53,36 @@ namespace Aya.Events
         }
 
         /// <summary>
+        /// 添加到事件组
+        /// </summary>
+        /// <param name="eventHandler">事件处理器</param>
+        public void Add(EventHandler eventHandler)
+        {
+            Handlers.Add(eventHandler);
+            if (eventHandler.Priority != 0 && !NeedSort)
+            {
+                NeedSort = true;
+            }
+
+            if (NeedSort)
+            {
+                SortEvents();
+            }
+
+            UEventCallback.OnAdded?.Invoke(eventHandler);
+        }
+
+        /// <summary>
+        /// 从事件组移除
+        /// </summary>
+        /// <param name="eventHandler">事件处理器</param>
+        public void Remove(EventHandler eventHandler)
+        {
+            Handlers.Remove(eventHandler);
+            UEventCallback.OnRemoved?.Invoke(eventHandler);
+        }
+
+        /// <summary>
         /// 事件列表按优先级排序
         /// </summary>
         public void SortEvents()

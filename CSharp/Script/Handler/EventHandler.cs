@@ -71,6 +71,8 @@ namespace Aya.Events
                 result = InvokeMethod(this, args);
             }
 
+            UEventCallback.OnDispatched?.Invoke(this, args);
+
             return result;
         }
 
@@ -90,7 +92,7 @@ namespace Aya.Events
             }
             catch (Exception exception)
             {
-                EventInterface.OnError(exception);
+                UEventCallback.OnError?.Invoke(eventHandler, exception);
                 return false;
             }
 
@@ -159,7 +161,7 @@ namespace Aya.Events
             }
             catch (Exception exception)
             {
-                EventInterface.OnError(exception);
+                UEventCallback.OnError?.Invoke(eventHandler, exception);
                 return false;
             }
 

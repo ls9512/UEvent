@@ -30,15 +30,19 @@ namespace Aya.Events
         /// <returns>执行结果</returns>
         public override bool Invoke(params object[] args)
         {
+            var result = false;
             if (ActionT2 != null)
             {
-                var result = InvokeAction(this, args);
+                result = InvokeAction(this, args);
+                UEventCallback.OnDispatched?.Invoke(this, args);
                 return result;
             }
             else
             {
-                return base.Invoke(args);
+                result = base.Invoke(args);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -59,7 +63,7 @@ namespace Aya.Events
                 }
                 catch (Exception exception)
                 {
-                    EventInterface.OnError(exception);
+                    UEventCallback.OnError?.Invoke(eventHandler, exception);
                     return false;
                 }
             }
@@ -73,7 +77,7 @@ namespace Aya.Events
                 }
                 catch (Exception exception)
                 {
-                    EventInterface.OnError(exception);
+                    UEventCallback.OnError?.Invoke(eventHandler, exception);
                     return false;
                 }
             }

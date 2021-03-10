@@ -82,8 +82,8 @@ namespace Aya.Events
         public bool ContainsListener<T>()
         {
             var eventType = typeof(T);
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var result = handlerGroup.Handlers.Count > 0;
+            var eventHandlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var result = eventHandlerGroup.Handlers.Count > 0;
             return result;
         }
 
@@ -138,14 +138,14 @@ namespace Aya.Events
         public void RemoveListener<T>(Action action)
         {
             var eventType = typeof(T);
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var eventHandlers = handlerGroup.Handlers;
+            var eventHandlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var eventHandlers = eventHandlerGroup.Handlers;
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
                 if (eventHandler.Action.Equals(action))
                 {
-                    eventHandlers.Remove(eventHandler);
+                    eventHandlerGroup.Remove(eventHandler);
                 }
             }
         }
@@ -158,14 +158,14 @@ namespace Aya.Events
         public void RemoveListener<T>(Action<T> action)
         {
             var eventType = typeof(T);
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var handlers = handlerGroup.Handlers;
-            for (var i = handlers.Count - 1; i >= 0; i--)
+            var eventHandlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
-                if (!(handlers[i] is EventHandler<T> eventHandler)) continue;
+                if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
                 if (eventHandler.ActionT1.Equals(action))
                 {
-                    handlers.Remove(eventHandler);
+                    eventHandlerGroup.Remove(eventHandler);
                 }
             }
         }
@@ -177,14 +177,14 @@ namespace Aya.Events
         /// <param name="method">监听方法</param>
         public void RemoveListener<T>(object target, MethodInfo method)
         {
-            var handlerGroup = _getOrAddHandlerGroup<T>(EventDic);
-            var eventHandlers = handlerGroup.Handlers;
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            var eventHandlers = eventHandlerGroup.Handlers;
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
                 if (eventHandler.Target == null || (eventHandler.Target.Equals(target) && eventHandler.Method.Equals(method)))
                 {
-                    eventHandlers.Remove(eventHandler);
+                    eventHandlerGroup.Remove(eventHandler);
                 }
             }
         }
@@ -200,11 +200,11 @@ namespace Aya.Events
         /// <param name="eventData">事件参数</param>
         public void Dispatch<T>(T eventData)
         {
-            var eventGroup = _getOrAddHandlerGroup<T>(EventDic);
-            var handlers = eventGroup.Handlers;
-            for (var i = 0; i < handlers.Count; i++)
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = 0; i < eventHandlers.Count; i++)
             {
-                var eventHandler = handlers[i];
+                var eventHandler = eventHandlers[i];
                 eventHandler.Invoke(eventData);
                 if (eventHandler.Interrupt) break;
             }
@@ -222,11 +222,11 @@ namespace Aya.Events
         /// <param name="eventData">事件参数</param>
         public void DispatchTo<T>(object target, T eventData)
         {
-            var handlerGroup = _getOrAddHandlerGroup<T>(EventDic);
-            var handlers = handlerGroup.Handlers;
-            for (var i = 0; i < handlers.Count; i++)
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = 0; i < eventHandlers.Count; i++)
             {
-                var eventHandler = handlers[i];
+                var eventHandler = eventHandlers[i];
                 var condition1 = eventHandler.Target == null && target == null;
                 var condition2 = eventHandler.Target != null && eventHandler.Target.Equals(target);
                 var check = condition1 || condition2;
@@ -244,11 +244,11 @@ namespace Aya.Events
         /// <param name="eventData">事件参数</param>
         public void DispatchTo<T>(Predicate<object> predicate, T eventData)
         {
-            var handlerGroup = _getOrAddHandlerGroup<T>(EventDic);
-            var handlers = handlerGroup.Handlers;
-            for (var i = 0; i < handlers.Count; i++)
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = 0; i < eventHandlers.Count; i++)
             {
-                var eventHandler = handlers[i];
+                var eventHandler = eventHandlers[i];
                 if (!predicate(eventHandler.Target)) continue;
                 eventHandler.Invoke(eventData);
                 if (eventHandler.Interrupt) break;
@@ -267,11 +267,11 @@ namespace Aya.Events
         /// <param name="eventData">事件参数</param>
         public void DispatchGroup<T>(object group, T eventData)
         {
-            var handlerGroup = _getOrAddHandlerGroup<T>(EventDic);
-            var handlers = handlerGroup.Handlers;
-            for (var i = 0; i < handlers.Count; i++)
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = 0; i < eventHandlers.Count; i++)
             {
-                var eventHandler = handlers[i];
+                var eventHandler = eventHandlers[i];
                 var condition1 = eventHandler.Group == null && group == null;
                 var condition2 = eventHandler.Group != null && eventHandler.Group.Equals(group);
                 var check = condition1 || condition2;
@@ -333,17 +333,8 @@ namespace Aya.Events
 
         private void _cacheEventHandler<T>(EventHandler eventHandler)
         {
-            var handlerGroup = _getOrAddHandlerGroup<T>(EventDic);
-            if (eventHandler.Priority != 0 && !handlerGroup.NeedSort)
-            {
-                handlerGroup.NeedSort = true;
-            }
-
-            handlerGroup.Handlers.Add(eventHandler);
-            if (handlerGroup.NeedSort)
-            {
-                handlerGroup.SortEvents();
-            }
+            var eventHandlerGroup = _getOrAddHandlerGroup<T>(EventDic);
+            eventHandlerGroup.Add(eventHandler);
         }
 
         /// <summary>

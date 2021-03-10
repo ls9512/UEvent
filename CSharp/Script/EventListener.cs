@@ -160,9 +160,9 @@ namespace Aya.Events
         /// <param name="group">监听分组</param>
         /// <param name="priority">优先级</param>
         /// <param name="interrupt">是否中断事件队列</param>
-        private void _addListener<T>(T eventType, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
+        private void _addListener(object eventType, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
         {
-            var dispatcher = EventManager.GetDispatcher<T>();
+            var dispatcher = EventManager.GetDispatcher(eventType.GetType());
             dispatcher.AddListener(eventType, Listener, method, group, priority, interrupt);
             if (!RegisteredDispatchers.Contains(dispatcher))
             {

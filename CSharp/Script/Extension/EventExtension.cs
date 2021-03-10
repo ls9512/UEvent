@@ -14,17 +14,19 @@ namespace Aya.Events
     public static class EventExtension
     {
         #region Add Listener
-        
+
         /// <summary>
         /// 添加监听
         /// </summary>
         /// <param name="obj">对象</param>
         /// <param name="eventType">事件类型</param>
         /// <param name="method">监听方法</param>
+        /// <param name="group">监听分组</param>
         /// <param name="priority">优先级</param>
-        public static void AddListener<T>(this object obj, T eventType, MethodInfo method, int priority = 0)
+        /// <param name="interrupt">是否中断事件队列</param>
+        public static void AddListener<T>(this object obj, T eventType, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
         {
-            EventManager.GetDispatcher<T>().AddListener(eventType, obj, method, priority);
+            EventManager.GetDispatcher<T>().AddListener(eventType, obj, method, group, priority, interrupt);
         }
 
         /// <summary>
@@ -33,10 +35,12 @@ namespace Aya.Events
         /// <param name="obj">对象</param>
         /// <param name="eventType">事件类型</param>
         /// <param name="action">监听委托</param>
+        /// <param name="group">监听分组</param>
         /// <param name="priority">优先级</param>
-        public static void AddListener<T>(this object obj, T eventType, Action<T, object[]> action, int priority = 0)
+        /// <param name="interrupt">是否中断事件队列</param>
+        public static void AddListener<T>(this object obj, T eventType, Action<T, object[]> action, object group = null, int priority = 0, bool interrupt = false)
         {
-            EventManager.GetDispatcher<T>().AddListener(eventType, action, priority);
+            EventManager.GetDispatcher<T>().AddListener(eventType, action, group, priority, interrupt);
         }
         
         #endregion
