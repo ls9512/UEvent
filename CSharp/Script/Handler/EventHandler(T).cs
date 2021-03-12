@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-//  Script   : EventHandlerT.cs
+//  Script   : EventHandler(T).cs
 //  Info     : 事件处理器 泛型版本，用于约束指定类型的事件委托
 //  Author   : ls9512
 //  E-mail   : ls9512@vip.qq.com

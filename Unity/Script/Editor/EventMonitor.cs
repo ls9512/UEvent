@@ -88,6 +88,9 @@ namespace Aya.Events
 
         #region Draw Table
 
+        private string _searchEvent;
+        private string _searchEventType;
+
         private Action<int, float, EventHandler>[] _tableCellDrawers;
         private string[] _tableHeaders;
         private float[] _tableCellWidthWeights;
@@ -111,52 +114,86 @@ namespace Aya.Events
 
         public void DrawTable()
         {
-            if (!Application.isPlaying) return;
-
-            GUILayout.Label("Event Info", EditorStyles.largeLabel);
-
-            // Event Table
-            using (new GUIScrollView(ref _tableScrollPos))
+            if (!Application.isPlaying)
             {
-                var dispatcherDic = EventManager.DispatcherDic;
-                foreach (var dispatcherKv in dispatcherDic)
+                GUILayout.Label("Player is not running", EditorStyles.largeLabel);
+            }
+            else
+            {
+                using (new GUIFoldOut(this, "Filter"))
                 {
-                    var dispatchType = dispatcherKv.Key;
-                    var dispatcher = dispatcherKv.Value;
-
-                    using (new GUIFoldOut(this, dispatchType.Name))
+                    if (GUIFoldOut.GetState(this, "Filter"))
                     {
-                        if (GUIFoldOut.GetState(this, dispatchType.Name))
+                        using (new GUIHorizontal(null))
                         {
-                            var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                            GUILayout.Label("Event", GUILayout.Width(EditorGUIUtility.labelWidth / 3f));
+                            _searchEvent = EditorGUILayout.TextArea(_searchEvent, EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
+                            GUILayout.Label("Event Type", GUILayout.Width(EditorGUIUtility.labelWidth / 2f));
+                            _searchEventType = EditorGUILayout.TextArea(_searchEventType, EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
+                        }
+                    }
+                }
 
-                            using (new GUITable<EventHandler>(
-                                _tableHeaders,
-                                // _tableCellDrawers,
-                                (rowIndex, columnWidths, eventHandler) =>
-                                {
-                                    // var isDispatched = DispatchedList.Contains(eventHandler);
-                                    // var rowStyle = isDispatched ? DispatchRowStyle : null;
-                                    using (new GUITableRow(rowIndex))
+                // Event Table
+                using (new GUIScrollView(ref _tableScrollPos))
+                {
+                    var dispatcherDic = EventManager.DispatcherDic;
+                    foreach (var dispatcherKv in dispatcherDic)
+                    {
+                        var dispatchType = dispatcherKv.Key;
+                        var dispatcher = dispatcherKv.Value;
+
+                        if (!string.IsNullOrEmpty(_searchEvent))
+                        {
+                            if (!dispatchType.Name.Contains(_searchEvent))
+                            {
+                                continue;
+                            }
+                        }
+
+                        using (new GUIFoldOut(this, dispatchType.Name))
+                        {
+                            if (GUIFoldOut.GetState(this, dispatchType.Name))
+                            {
+                                var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) /
+                                                 EditorGUIUtility.pixelsPerPoint;
+
+                                using (new GUITable<EventHandler>(
+                                    _tableHeaders,
+                                    // _tableCellDrawers,
+                                    (rowIndex, columnWidths, eventHandler) =>
                                     {
-                                        for (var i = 0; i < _tableCellDrawers.Length; i++)
+                                        // var isDispatched = DispatchedList.Contains(eventHandler);
+                                        // var rowStyle = isDispatched ? DispatchRowStyle : null;
+                                        if (!string.IsNullOrEmpty(_searchEventType))
                                         {
-                                            var cellWidth = columnWidths[i];
-                                            using (new GUITableCell(rowIndex, i, cellWidth))
+                                            if (!eventHandler.Type.ToString().Contains(_searchEventType))
                                             {
-                                                _tableCellDrawers[i](rowIndex, cellWidth, eventHandler);
+                                                return;
                                             }
                                         }
-                                    }
-                                },
-                                ForeachRow(dispatcher),
-                                tableWidth,
-                                _tableCellWidthWeights)
-                            )
-                            {
-                                GUI.enabled = true;
-                            }
 
+                                        using (new GUITableRow(rowIndex))
+                                        {
+                                            for (var i = 0; i < _tableCellDrawers.Length; i++)
+                                            {
+                                                var cellWidth = columnWidths[i];
+                                                using (new GUITableCell(rowIndex, i, cellWidth))
+                                                {
+                                                    _tableCellDrawers[i](rowIndex, cellWidth, eventHandler);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    ForeachRow(dispatcher),
+                                    tableWidth,
+                                    _tableCellWidthWeights)
+                                )
+                                {
+                                    GUI.enabled = true;
+                                }
+
+                            }
                         }
                     }
                 }
@@ -476,7 +513,7 @@ namespace Aya.Events
         {
             public static Dictionary<Object, Dictionary<string, bool>> StateCacheDic = new Dictionary<Object, Dictionary<string, bool>>();
 
-            public GUIFoldOut(Object target, string title, bool defaultState = true, params GUILayoutOption[] options)
+            public GUIFoldOut(Object target, string title, bool defaultState = true, GUILayoutOption[] options = null)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox, options);
                 var rect = EditorGUILayout.GetControlRect();
@@ -535,7 +572,7 @@ namespace Aya.Events
 
         public struct GUITabArea : IDisposable
         {
-            public GUITabArea(float tabSize, params GUILayoutOption[] options)
+            public GUITabArea(float tabSize, GUILayoutOption[] options = null)
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(tabSize);
@@ -567,12 +604,12 @@ namespace Aya.Events
 
         public struct GUIVertical : IDisposable
         {
-            public GUIVertical(params GUILayoutOption[] options)
+            public GUIVertical(GUILayoutOption[] options = null)
             {
                 GUILayout.BeginVertical(options);
             }
 
-            public GUIVertical(GUIStyle style, params GUILayoutOption[] options)
+            public GUIVertical(GUIStyle style, GUILayoutOption[] options = null)
             {
                 GUILayout.BeginVertical(style, options);
             }
@@ -585,12 +622,12 @@ namespace Aya.Events
 
         public struct GUIHorizontal : IDisposable
         {
-            public GUIHorizontal(params GUILayoutOption[] options)
+            public GUIHorizontal(GUILayoutOption[] options = null)
             {
                 GUILayout.BeginHorizontal(options);
             }
 
-            public GUIHorizontal(GUIStyle style, params GUILayoutOption[] options)
+            public GUIHorizontal(GUIStyle style, GUILayoutOption[] options = null)
             {
                 GUILayout.BeginHorizontal(style, options);
             }
@@ -603,12 +640,12 @@ namespace Aya.Events
 
         public struct GUIScrollView : IDisposable
         {
-            public GUIScrollView(ref Vector2 pos, params GUILayoutOption[] options)
+            public GUIScrollView(ref Vector2 pos, GUILayoutOption[] options = null)
             {
                 pos = GUILayout.BeginScrollView(pos, options);
             }
 
-            public GUIScrollView(ref Vector2 pos, GUIStyle style, params GUILayoutOption[] options)
+            public GUIScrollView(ref Vector2 pos, GUIStyle style, GUILayoutOption[] options = null)
             {
                 GUILayout.BeginScrollView(pos, style, options);
             }
