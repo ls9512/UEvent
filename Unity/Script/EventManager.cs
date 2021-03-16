@@ -42,6 +42,7 @@ namespace Aya.Events
         protected static void Init()
         {
             var ins = Ins;
+            UEventCallback.OnError += (eventHandler, exception) => Debug.LogError(exception.ToString());
         }
 
         #endregion

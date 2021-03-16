@@ -108,7 +108,7 @@ namespace Aya.Events
                 DrawCellHandler
             };
 
-            _tableHeaders = new[] { "Event", "Target", "Group", "Priority", "Interrupt", "Handler" };
+            _tableHeaders = new[] {"Event", "Target", "Group", "Priority", "Interrupt", "Handler"};
             _tableCellWidthWeights = new[] {2f, 1.5f, 1f, 0.35f, 0.4f, 2.5f};
         }
 
@@ -127,9 +127,11 @@ namespace Aya.Events
                         using (new GUIHorizontal(null))
                         {
                             GUILayout.Label("Event", GUILayout.Width(EditorGUIUtility.labelWidth / 3f));
-                            _searchEvent = EditorGUILayout.TextArea(_searchEvent, EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
+                            _searchEvent = EditorGUILayout.TextArea(_searchEvent, EditorStyles.toolbarSearchField,
+                                GUILayout.Width(EditorGUIUtility.labelWidth));
                             GUILayout.Label("Event Type", GUILayout.Width(EditorGUIUtility.labelWidth / 2f));
-                            _searchEventType = EditorGUILayout.TextArea(_searchEventType, EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
+                            _searchEventType = EditorGUILayout.TextArea(_searchEventType,
+                                EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
                         }
                     }
                 }
@@ -210,7 +212,7 @@ namespace Aya.Events
                     yield return eventHandler;
                 }
             }
-        } 
+        }
 
         #endregion
 
@@ -223,13 +225,25 @@ namespace Aya.Events
 
         public void DrawCellTarget(int index, float width, EventHandler eventHandler)
         {
-            if (eventHandler.Target is MonoBehaviour mono)
+            var target = eventHandler.Target;
+            if (target != null)
             {
-                EditorGUILayout.ObjectField(mono, typeof(GameObject), true);
+                if (target is MonoBehaviour mono)
+                {
+                    EditorGUILayout.ObjectField(mono, typeof(GameObject), true);
+                }
+                else
+                {
+
+                    GUILayout.Label(target.ToString());
+                }
             }
             else
             {
-                GUILayout.Label(eventHandler.Target.ToString());
+                using (new GUIColorArea(Color.gray))
+                {
+                    GUILayout.Label("NULL");
+                }
             }
         }
 
@@ -270,13 +284,16 @@ namespace Aya.Events
 
         public void DrawCellHandler(int index, float width, EventHandler eventHandler)
         {
-            if (eventHandler.Action != null)
-            {
-                GUILayout.Label(eventHandler.Action.ToString());
-            }
-            else if (eventHandler.Method != null)
+            if (eventHandler.Method != null)
             {
                 GUILayout.Label(eventHandler.Method.ToString());
+            }
+            else
+            {
+                using (new GUIColorArea(Color.gray))
+                {
+                    GUILayout.Label("NULL");
+                }
             }
 
             if (eventHandler.Interrupt)

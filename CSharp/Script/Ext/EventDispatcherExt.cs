@@ -290,11 +290,13 @@ namespace Aya.Events
             var eventHandler = new EventHandler
             {
                 Type = typeof(T),
-                Target = null,
+                Target = action.Target,
                 Group = group,
                 Priority = priority,
                 Interrupt = interrupt,
-                Action = action,
+                Method = action.Method,
+                Parameters = action.Method.GetParameters(),
+                Action = action
             };
 
             return eventHandler;
@@ -305,11 +307,15 @@ namespace Aya.Events
             var eventHandler = new EventHandler<T>
             {
                 Type = typeof(T),
-                Target = null,
+                Target = action.Target,
                 Group = group,
                 Priority = priority,
                 Interrupt = interrupt,
+                Method = action.Method,
+                Parameters = action.Method.GetParameters(),
+                Action = null,
                 ActionT1 = action,
+                ActionT2 = null
             };
 
             return eventHandler;
@@ -326,6 +332,7 @@ namespace Aya.Events
                 Interrupt = interrupt,
                 Method = methodInfo,
                 Parameters = methodInfo.GetParameters(),
+                Action = null
             };
 
             return eventHandler;

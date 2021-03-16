@@ -62,11 +62,7 @@ namespace Aya.Events
         public virtual bool Invoke(params object[] args)
         {
             var result = false;
-            if (Action != null)
-            {
-                result = InvokeAction(this);
-            }
-            else if (Method != null)
+            if (Method != null)
             {
                 result = InvokeMethod(this, args);
             }
@@ -74,29 +70,6 @@ namespace Aya.Events
             UEventCallback.OnDispatched?.Invoke(this, args);
 
             return result;
-        }
-
-        /// <summary>
-        /// 执行监听委托
-        /// </summary>
-        /// <param name="eventHandler">监听事件数据</param>
-        /// <returns>执行结果</returns>
-        internal static bool InvokeAction(EventHandler eventHandler)
-        {
-            var action = eventHandler.Action;
-            if (action == null) return false;
-
-            try
-            {
-                action.Invoke();
-            }
-            catch (Exception exception)
-            {
-                UEventCallback.OnError?.Invoke(eventHandler, exception);
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

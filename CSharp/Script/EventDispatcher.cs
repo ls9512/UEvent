@@ -391,10 +391,12 @@ namespace Aya.Events
             var eventHandler = new EventHandler
             {
                 Type = eventType,
-                Target = null,
+                Target = action.Target,
                 Group = group,
                 Priority = priority,
                 Interrupt = interrupt,
+                Method = action.Method,
+                Parameters = action.Method.GetParameters(),
                 Action = action,
             };
 
@@ -406,11 +408,15 @@ namespace Aya.Events
             var eventHandler = new EventHandler<T>
             {
                 Type = eventType,
-                Target = null,
+                Target = action.Target,
                 Group = group,
                 Priority = priority,
                 Interrupt = interrupt,
+                Method = action.Method,
+                Parameters = action.Method.GetParameters(),
+                Action = null,
                 ActionT1 = action,
+                ActionT2 = null
             };
 
             return eventHandler;
@@ -421,10 +427,14 @@ namespace Aya.Events
             var eventHandler = new EventHandler<T>
             {
                 Type = eventType,
-                Target = null,
+                Target = action.Target,
                 Group = group,
                 Priority = priority,
                 Interrupt = interrupt,
+                Method = action.Method,
+                Parameters = action.Method.GetParameters(),
+                Action = null,
+                ActionT1 = null,
                 ActionT2 = action,
             };
 
@@ -442,6 +452,7 @@ namespace Aya.Events
                 Interrupt = interrupt,
                 Method = methodInfo,
                 Parameters = methodInfo.GetParameters(),
+                Action = null,
             };
 
             return eventHandler;
@@ -451,27 +462,6 @@ namespace Aya.Events
         {
             var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
             handlerGroup.Add(eventHandler);
-        }
-
-        /// <summary>
-        /// 尝试从方法信息创建出委托
-        /// </summary>
-        /// <typeparam name="T">事件类型</typeparam>
-        /// <param name="target">目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        /// <returns>委托</returns>
-        private Action<T, object[]> _createDelegateFromMethodInfo<T>(object target, MethodInfo methodInfo)
-        {
-            try
-            {
-                var del = Delegate.CreateDelegate(typeof(Action<T, object[]>), target, methodInfo);
-                var action = del as Action<T, object[]>;
-                return action;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         /// <summary>
