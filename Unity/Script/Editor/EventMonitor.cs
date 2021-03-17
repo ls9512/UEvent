@@ -17,6 +17,8 @@ namespace Aya.Events
 {
     public class EventMonitor : EditorWindow
     {
+        #region Menu
+      
         public static EventMonitor Instance;
 
         [MenuItem("Aya Game Studio/Plugins/Event Monitor", false, 0)]
@@ -32,7 +34,9 @@ namespace Aya.Events
             }
 
             Instance.Show();
-        }
+        } 
+
+        #endregion
 
         #region Monobehaviour
 
@@ -114,11 +118,13 @@ namespace Aya.Events
                 DrawCellGroup,
                 DrawCellPriority,
                 DrawCelInterrupt,
-                DrawCellHandler
+                DrawCellHandler,
+                DrawCellCounter,
+                DrawCellLastTime,
             };
 
-            _tableHeaders = new[] {"Event", "Target", "Group", "Priority", "Interrupt", "Handler"};
-            _tableCellWidthWeights = new[] {2f, 1.5f, 1f, 0.35f, 0.4f, 2.5f};
+            _tableHeaders = new[] {"Event", "Target", "Group", "Priority", "Interrupt", "Handler", "Dispatch", "Last Time"};
+            _tableCellWidthWeights = new[] {1.5f, 1.5f, 1f, 0.35f, 0.4f, 2.5f, 0.5f, 1f};
         }
 
         public void DrawTable()
@@ -154,26 +160,12 @@ namespace Aya.Events
                                 _tableHeaders,
                                 (rowIndex, columnWidths, eventHandler) =>
                                 {
-                                    if (!string.IsNullOrEmpty(_searchEventType))
+                                    if (!string.IsNullOrEmpty(_searchEventType) && !eventHandler.Type.ToString().Contains(_searchEventType))
                                     {
-                                        if (!eventHandler.Type.ToString().Contains(_searchEventType))
-                                        {
-                                            return;
-                                        }
+                                        return;
                                     }
 
-                                    var rowColor = GUI.backgroundColor;
-                                    if (eventHandler.IsInvoking)
-                                    {
-                                        rowColor = Color.Lerp(Color.green, GUI.backgroundColor, eventHandler.InvokingProgress);
-                                    }
-
-                                    if (eventHandler.IsCreating)
-                                    {
-                                        rowColor = Color.Lerp(Color.cyan, GUI.backgroundColor, eventHandler.CreatingProgress);
-                                    }
-
-                                    using (new GUIFullColorArea(rowColor))
+                                    using (new GUIFullColorArea(GetRowColor(eventHandler)))
                                     {
                                         using (new GUITableRow(rowIndex))
                                         {
@@ -208,6 +200,27 @@ namespace Aya.Events
                     }
                 }
             }
+        }
+
+        private Color GetRowColor(EventHandler eventHandler)
+        {
+            var rowColor = GUI.backgroundColor;
+            if (eventHandler.IsInvokeSuccess)
+            {
+                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipSuccessColor, GUI.backgroundColor, eventHandler.InvokeSuccessProgress);
+            }
+
+            if (eventHandler.IsInvokeFail)
+            {
+                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipFailColor, GUI.backgroundColor, eventHandler.InvokeFailProgress);
+            }
+
+            if (eventHandler.IsListening)
+            {
+                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipListenColor, GUI.backgroundColor, eventHandler.ListeningProgress);
+            }
+
+            return rowColor;
         }
 
         private IEnumerable<EventHandler> ForeachRow()
@@ -332,6 +345,36 @@ namespace Aya.Events
             }
         }
 
+        public void DrawCellCounter(int index, float width, EventHandler eventHandler)
+        {
+            if (eventHandler.DispatchCounter > 0)
+            {
+                GUILayout.Label(eventHandler.DispatchCounter.ToString());
+            }
+            else
+            {
+                using (new GUIColorArea(Color.gray))
+                {
+                    GUILayout.Label("0");
+                }
+            }
+        }
+
+        public void DrawCellLastTime(int index, float width, EventHandler eventHandler)
+        {
+            if (eventHandler.DispatchCounter > 0)
+            {
+                GUILayout.Label(eventHandler.LastInvokeDateTime.ToString("yyyyMMdd HH:mm:ss"));
+            }
+            else
+            {
+                using (new GUIColorArea(Color.gray))
+                {
+                    GUILayout.Label("None");
+                }
+            }
+        }
+
         #endregion
 
         #region Callback
@@ -348,208 +391,21 @@ namespace Aya.Events
 
         }
 
-        public void OnDispatched(EventHandler eventHandler, object[] args, bool result)
+        public void OnDispatched(EventHandler eventHandler, object[] args, bool success)
         {
-            eventHandler.LastInvokeTime = Time.realtimeSinceStartup;
+            if (success)
+            {
+                eventHandler.LastInvokeSuccessTime = Time.realtimeSinceStartup;
+            }
+            else
+            {
+                eventHandler.LastInvokeFailTime = Time.realtimeSinceStartup;
+            }
         }
 
         public void OnError(EventHandler eventHandler, Exception exception)
         {
 
-        }
-
-        #endregion
-
-        #region GUI Table
-
-        public struct GUITable<T> : IDisposable
-        {
-            public static GUIStyle HeaderStyle = new GUIStyle()
-            {
-                // alignment = TextAnchor.MiddleCenter,
-                normal = new GUIStyleState()
-                {
-                    textColor = Color.white,
-                    background = MakeTex(2, 2, new Color(0f, 0f, 0f, 0.2f))
-                }
-            };
-
-            public GUITable(string[] headers, Action<int, float, T>[] cellDrawers, IEnumerable<T> dataList, float tableWidth, float[] columnWidthWeights)
-            {
-                GUILayout.BeginVertical();
-                var columnWidths = CalcColumnWidths(tableWidth, columnWidthWeights);
-
-                // Header
-                DrawHeader(headers, columnWidths);
-
-                // Rows
-                var index = 0;
-                foreach (var data in dataList)
-                {
-                    var row = index;
-                    using (new GUITableRow(row))
-                    {
-                        for (var i = 0; i < cellDrawers.Length; i++)
-                        {
-                            var cellWidth = columnWidths[i];
-                            var drawer = cellDrawers[i];
-                            using (new GUITableCell(row, i, cellWidth))
-                            {
-                                drawer(row, cellWidth, data);
-                            }
-
-                            if (i < cellDrawers.Length)
-                            {
-                                // GUILayout.Space(1);
-                            }
-                        }
-                    }
-
-                    index++;
-                }
-            }
-
-            public GUITable(string[] headers, Action<int, float[], T> rowDrawer, IEnumerable<T> dataList, float tableWidth, float[] columnWidthWeights)
-            {
-                GUILayout.BeginVertical();
-                var columnWidths = CalcColumnWidths(tableWidth, columnWidthWeights);
-
-                // Header
-                DrawHeader(headers, columnWidths);
-
-                // Rows
-                var index = 0;
-                foreach (var data in dataList)
-                {
-                    var row = index;
-                    using (new GUITableRow(row))
-                    {
-                        rowDrawer(row, columnWidths, data);
-                    }
-
-                    index++;
-                }
-            }
-
-            public void DrawHeader(string[] headers, float[] columnWidths)
-            {
-                GUILayout.BeginHorizontal(HeaderStyle);
-                for (var i = 0; i < headers.Length; i++)
-                {
-                    var header = headers[i];
-                    GUILayout.Label(header, GUILayout.Width(columnWidths[i]));
-                }
-
-                GUILayout.EndHorizontal();
-            }
-
-            public float[] CalcColumnWidths(float tableWidth, float[] columnWidthWeights)
-            {
-                var columnWidths = new float[columnWidthWeights.Length];
-                var weightCount = 0f;
-                foreach (var weight in columnWidthWeights)
-                {
-                    weightCount += weight;
-                }
-
-                for (var i = 0; i < columnWidthWeights.Length; i++)
-                {
-                    var weight = columnWidthWeights[i];
-                    var columnWidth = weight / weightCount * tableWidth;
-                    columnWidths[i] = columnWidth;
-                }
-
-                return columnWidths;
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndVertical();
-            }
-        }
-
-        public struct GUITableCell : IDisposable
-        {
-            public GUITableCell(int rowIndex, int columnIndex, float cellWidth)
-            {
-                GUILayout.BeginHorizontal(GUILayout.Width(cellWidth));
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        public struct GUITableRow : IDisposable
-        {
-            public static GUIStyle OddRowStyle = new GUIStyle()
-            {
-                normal = new GUIStyleState()
-                {
-                    background = MakeTex(2, 2, new Color(0f, 0f, 0f, 0.035f))
-                }
-            };
-
-            public static GUIStyle EvenRowStyle = new GUIStyle()
-            {
-                normal = new GUIStyleState()
-                {
-                    background = MakeTex(2, 2, new Color(1f, 1f, 1f, 0.05f))
-                }
-            };
-
-            public GUITableRow(int rowIndex, GUIStyle style = null, params GUILayoutOption[] options)
-            {
-                if (style == null)
-                {
-                    if (rowIndex % 2 == 0)
-                    {
-                        GUILayout.BeginHorizontal(EvenRowStyle);
-                    }
-                    else
-                    {
-                        GUILayout.BeginHorizontal(OddRowStyle);
-                    }
-                }
-                else
-                {
-                    GUILayout.BeginHorizontal(style, options);
-                }
-            }
-
-            public GUITableRow(int rowIndex, params GUILayoutOption[] options)
-            {
-                if (rowIndex % 2 == 0)
-                {
-                    GUILayout.BeginHorizontal(EvenRowStyle, options);
-                }
-                else
-                {
-                    GUILayout.BeginHorizontal(OddRowStyle, options);
-                }
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        public static Texture2D MakeTex(int width, int height, Color col)
-        {
-            var pix = new Color[width * height];
-
-            for (var i = 0; i < pix.Length; i++)
-            {
-                pix[i] = col;
-            }
-
-            var result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-
-            return result;
         }
 
         #endregion

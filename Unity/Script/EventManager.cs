@@ -43,6 +43,9 @@ namespace Aya.Events
         {
             var ins = Ins;
             UEventCallback.OnError += (eventHandler, exception) => Debug.LogError(exception.ToString());
+#if UNITY_EDITOR
+            UEventCallback.OnDispatched += EventHandler.CacheLog;
+#endif
         }
 
         #endregion

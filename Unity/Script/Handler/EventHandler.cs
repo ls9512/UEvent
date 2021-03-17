@@ -6,6 +6,8 @@
 //  E-mail   : ls9512@vip.qq.com
 //
 /////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
@@ -16,17 +18,44 @@ namespace Aya.Events
     {
 #if UNITY_EDITOR
 
+        #region Log
+
+        public int DispatchCounter => DispatchSuccessCounter + DispatchFailCounter;
+        public int DispatchSuccessCounter;
+        public int DispatchFailCounter;
+        public DateTime LastInvokeDateTime;
+
+        internal static void CacheLog(EventHandler eventHandler, object[] args, bool success)
+        {
+            if (success)
+            {
+                eventHandler.DispatchSuccessCounter++;
+            }
+            else
+            {
+                eventHandler.DispatchFailCounter++;
+            }
+
+            eventHandler.LastInvokeDateTime = DateTime.Now;
+        }
+
+        #endregion
+
         #region Animation Info
-        
+
         internal float AnimationDuration = 0.5f;
 
-        internal float LastInvokeTime = -1;
-        internal bool IsInvoking => Time.realtimeSinceStartup - LastInvokeTime < AnimationDuration;
-        internal float InvokingProgress => IsInvoking ? (Time.realtimeSinceStartup - LastInvokeTime) / AnimationDuration : 0f;
+        internal float LastInvokeSuccessTime = -1;
+        internal bool IsInvokeSuccess => Time.realtimeSinceStartup - LastInvokeSuccessTime < AnimationDuration;
+        internal float InvokeSuccessProgress => IsInvokeSuccess ? (Time.realtimeSinceStartup - LastInvokeSuccessTime) / AnimationDuration : 0f;
 
-        internal float CreateTime = Time.realtimeSinceStartup;
-        internal bool IsCreating => Time.realtimeSinceStartup - CreateTime < AnimationDuration;
-        internal float CreatingProgress => IsCreating ? (Time.realtimeSinceStartup - CreateTime) / AnimationDuration : 0f; 
+        internal float LastInvokeFailTime = -1;
+        internal bool IsInvokeFail => Time.realtimeSinceStartup - LastInvokeFailTime < AnimationDuration;
+        internal float InvokeFailProgress => IsInvokeFail ? (Time.realtimeSinceStartup - LastInvokeFailTime) / AnimationDuration : 0f;
+
+        internal float ListeningTime = Time.realtimeSinceStartup;
+        internal bool IsListening => Time.realtimeSinceStartup - ListeningTime < AnimationDuration;
+        internal float ListeningProgress => IsListening ? (Time.realtimeSinceStartup - ListeningTime) / AnimationDuration : 0f; 
 
         #endregion
 

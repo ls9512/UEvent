@@ -67,15 +67,15 @@ namespace Aya.Events
         /// <returns>执行结果</returns>
         public virtual bool Invoke(params object[] args)
         {
-            var result = false;
+            var success = false;
             if (Method != null)
             {
-                result = InvokeMethod(this, args);
+                success = InvokeMethod(this, args);
             }
 
-            UEventCallback.OnDispatched?.Invoke(this, args, result);
+            UEventCallback.OnDispatched?.Invoke(this, args, success);
 
-            return result;
+            return success;
         }
 
         /// <summary>
@@ -90,15 +90,15 @@ namespace Aya.Events
             var method = eventHandler.Method;
             var parameters = eventHandler.Parameters;
             var target = eventHandler.Target;
-            if (method == null) return false;
-            if (target == null) return false;
+
+            if (method == null || target == null) return false;
 
             try
             {
-                object result = null;
+                object returnValue = null;
                 if (parameters == null || parameters.Length == 0)
                 {
-                    result = method.Invoke(target, null);
+                    returnValue = method.Invoke(target, null);
                 }
                 else
                 {
@@ -109,11 +109,11 @@ namespace Aya.Events
                     if (parameters.Length == 1 + argIndexOffset && parameters[argIndexOffset].ParameterType == typeof(object[]))
                     {
                         // params object[]
-                        result = method.Invoke(target, needEventTypeArg ? new object[] { eventType, args } : new object[] { args });
+                        returnValue = method.Invoke(target, needEventTypeArg ? new object[] { eventType, args } : new object[] { args });
                     }
                     else if (parameters.Length == args.Length)
                     {
-                        result = method.Invoke(target, args);
+                        returnValue = method.Invoke(target, args);
                     }
                     else
                     {
@@ -129,11 +129,11 @@ namespace Aya.Events
                             argsOverride[i] = args[i - argIndexOffset];
                         }
 
-                        result = method.Invoke(target, argsOverride);
+                        returnValue = method.Invoke(target, argsOverride);
                     }
                 }
 
-                if (result != null)
+                if (returnValue != null)
                 {
 
                 }

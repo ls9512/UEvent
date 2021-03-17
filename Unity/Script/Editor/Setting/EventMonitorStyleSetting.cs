@@ -20,6 +20,11 @@ namespace Aya.Events
         public Color CodeMethodColor;
         public Color CodeParameterColor;
         public Color CodeNormalColor;
+
+        [Header("Tip Color")] 
+        public Color TipListenColor;
+        public Color TipSuccessColor;
+        public Color TipFailColor;
     }
 }
 #endif
