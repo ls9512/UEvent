@@ -11,7 +11,7 @@ using System;
 namespace Aya.Events
 {
     [Serializable]
-    public class EventHandler<T> : EventHandler
+    public partial class EventHandler<T> : EventHandler
     {
         /// <summary>
         /// 监听委托

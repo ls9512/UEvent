@@ -1,4 +1,12 @@
-﻿#if UNITY_EDITOR
+﻿/////////////////////////////////////////////////////////////////////////////
+//
+//  Script   : EventMonitor.cs
+//  Info     : 事件监视器
+//  Author   : ls9512 2021
+//  E-mail   : ls9512@vip.qq.com
+//
+/////////////////////////////////////////////////////////////////////////////
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -63,32 +71,33 @@ namespace Aya.Events
 
         #region Style
 
-        public static GUIStyle DispatchRowStyle
+        public static GUIStyle RichTextStyle
         {
             get
             {
-                if (_dispatchRowStyle == null)
+                if (_richTextStyle == null)
                 {
-                    _dispatchRowStyle = new GUIStyle()
+                    _richTextStyle = new GUIStyle()
                     {
                         normal = new GUIStyleState()
                         {
-                            background = MakeTex(2, 2, new Color(0f, 1f, 0f, 0.15f))
-                        }
+                            textColor = Color.white
+                        },
+                        alignment = TextAnchor.MiddleLeft,
+                        richText = true
                     };
                 }
 
-                return _dispatchRowStyle;
+                return _richTextStyle;
             }
         }
 
-        private static GUIStyle _dispatchRowStyle;
+        private static GUIStyle _richTextStyle;
 
         #endregion
 
         #region Draw Table
 
-        private string _searchEvent;
         private string _searchEventType;
 
         private Action<int, float, EventHandler>[] _tableCellDrawers;
@@ -126,9 +135,6 @@ namespace Aya.Events
                     {
                         using (new GUIHorizontal(null))
                         {
-                            GUILayout.Label("Event", GUILayout.Width(EditorGUIUtility.labelWidth / 3f));
-                            _searchEvent = EditorGUILayout.TextArea(_searchEvent, EditorStyles.toolbarSearchField,
-                                GUILayout.Width(EditorGUIUtility.labelWidth));
                             GUILayout.Label("Event Type", GUILayout.Width(EditorGUIUtility.labelWidth / 2f));
                             _searchEventType = EditorGUILayout.TextArea(_searchEventType,
                                 EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
@@ -137,44 +143,38 @@ namespace Aya.Events
                 }
 
                 // Event Table
-                using (new GUIScrollView(ref _tableScrollPos))
+                using (new GUIFoldOut(this, "Event"))
                 {
-                    var dispatcherDic = EventManager.DispatcherDic;
-                    foreach (var dispatcherKv in dispatcherDic)
+                    if (GUIFoldOut.GetState(this, "Event"))
                     {
-                        var dispatchType = dispatcherKv.Key;
-                        var dispatcher = dispatcherKv.Value;
-
-                        if (!string.IsNullOrEmpty(_searchEvent))
+                        using (new GUIScrollView(ref _tableScrollPos))
                         {
-                            if (!dispatchType.Name.Contains(_searchEvent))
-                            {
-                                continue;
-                            }
-                        }
-
-                        using (new GUIFoldOut(this, dispatchType.Name))
-                        {
-                            if (GUIFoldOut.GetState(this, dispatchType.Name))
-                            {
-                                var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) /
-                                                 EditorGUIUtility.pixelsPerPoint;
-
-                                using (new GUITable<EventHandler>(
-                                    _tableHeaders,
-                                    // _tableCellDrawers,
-                                    (rowIndex, columnWidths, eventHandler) =>
+                            var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                            using (new GUITable<EventHandler>(
+                                _tableHeaders,
+                                (rowIndex, columnWidths, eventHandler) =>
+                                {
+                                    if (!string.IsNullOrEmpty(_searchEventType))
                                     {
-                                        // var isDispatched = DispatchedList.Contains(eventHandler);
-                                        // var rowStyle = isDispatched ? DispatchRowStyle : null;
-                                        if (!string.IsNullOrEmpty(_searchEventType))
+                                        if (!eventHandler.Type.ToString().Contains(_searchEventType))
                                         {
-                                            if (!eventHandler.Type.ToString().Contains(_searchEventType))
-                                            {
-                                                return;
-                                            }
+                                            return;
                                         }
+                                    }
 
+                                    var rowColor = GUI.backgroundColor;
+                                    if (eventHandler.IsInvoking)
+                                    {
+                                        rowColor = Color.Lerp(Color.green, GUI.backgroundColor, eventHandler.InvokingProgress);
+                                    }
+
+                                    if (eventHandler.IsCreating)
+                                    {
+                                        rowColor = Color.Lerp(Color.cyan, GUI.backgroundColor, eventHandler.CreatingProgress);
+                                    }
+
+                                    using (new GUIFullColorArea(rowColor))
+                                    {
                                         using (new GUITableRow(rowIndex))
                                         {
                                             for (var i = 0; i < _tableCellDrawers.Length; i++)
@@ -186,17 +186,40 @@ namespace Aya.Events
                                                 }
                                             }
                                         }
-                                    },
-                                    ForeachRow(dispatcher),
-                                    tableWidth,
-                                    _tableCellWidthWeights)
-                                )
-                                {
-                                    GUI.enabled = true;
-                                }
-
+                                    }
+                                },
+                                ForeachRow(),
+                                tableWidth,
+                                _tableCellWidthWeights)
+                            )
+                            {
+                                GUI.enabled = true;
                             }
                         }
+                    }
+                }
+
+                // Log
+                using (new GUIFoldOut(this, "Log"))
+                {
+                    if (GUIFoldOut.GetState(this, "Log"))
+                    {
+
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<EventHandler> ForeachRow()
+        {
+            foreach (var dispatcher in EventManager.DispatcherDic.Values)
+            {
+                foreach (var eventKv in dispatcher.EventDic)
+                {
+                    var handlerGroup = eventKv.Value;
+                    foreach (var eventHandler in handlerGroup.Handlers)
+                    {
+                        yield return eventHandler;
                     }
                 }
             }
@@ -220,7 +243,14 @@ namespace Aya.Events
 
         public void DrawCellEventType(int index, float width, EventHandler eventHandler)
         {
-            GUILayout.Label(eventHandler.Type.ToString());
+            if (eventHandler.Type is Type type)
+            {
+                GUILayout.Label(type.Name);
+            }
+            else
+            {
+                GUILayout.Label(eventHandler.Type.ToString());
+            }
         }
 
         public void DrawCellTarget(int index, float width, EventHandler eventHandler)
@@ -286,7 +316,7 @@ namespace Aya.Events
         {
             if (eventHandler.Method != null)
             {
-                GUILayout.Label(eventHandler.Method.ToString());
+                GUILayout.Label(eventHandler.MethodSignature, RichTextStyle);
             }
             else
             {
@@ -318,9 +348,9 @@ namespace Aya.Events
 
         }
 
-        public void OnDispatched(EventHandler eventHandler, object[] args)
+        public void OnDispatched(EventHandler eventHandler, object[] args, bool result)
         {
-            // DispatchedList.Add(eventHandler);
+            eventHandler.LastInvokeTime = Time.realtimeSinceStartup;
         }
 
         public void OnError(EventHandler eventHandler, Exception exception)
@@ -616,6 +646,26 @@ namespace Aya.Events
             public void Dispose()
             {
                 GUI.color = OriginalColor;
+            }
+        }
+
+        public struct GUIFullColorArea : IDisposable
+        {
+            public Color OriginalBackColor;
+            public Color OriginalContentColor;
+
+            public GUIFullColorArea(Color color)
+            {
+                OriginalBackColor = GUI.backgroundColor;
+                GUI.backgroundColor = color;
+                OriginalContentColor = GUI.contentColor;
+                GUI.contentColor = color;
+            }
+
+            public void Dispose()
+            {
+                GUI.backgroundColor = OriginalBackColor;
+                GUI.contentColor = OriginalContentColor;
             }
         }
 

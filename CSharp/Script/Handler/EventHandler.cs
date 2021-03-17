@@ -12,8 +12,10 @@ using System.Reflection;
 namespace Aya.Events
 {
     [Serializable]
-    public class EventHandler
+    public partial class EventHandler
     {
+        #region Property
+        
         /// <summary>
         /// 事件类型
         /// </summary>
@@ -54,6 +56,10 @@ namespace Aya.Events
         /// </summary>
         public ParameterInfo[] Parameters { get; set; }
 
+        #endregion
+
+        #region Invoke
+        
         /// <summary>
         /// 执行事件
         /// </summary>
@@ -67,7 +73,7 @@ namespace Aya.Events
                 result = InvokeMethod(this, args);
             }
 
-            UEventCallback.OnDispatched?.Invoke(this, args);
+            UEventCallback.OnDispatched?.Invoke(this, args, result);
 
             return result;
         }
@@ -139,6 +145,8 @@ namespace Aya.Events
             }
 
             return true;
-        }
+        } 
+
+        #endregion
     }
 }
