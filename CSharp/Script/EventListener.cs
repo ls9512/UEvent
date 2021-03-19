@@ -162,7 +162,16 @@ namespace Aya.Events
         /// <param name="interrupt">是否中断事件队列</param>
         private void _addListener(object eventType, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
         {
-            var dispatcher = EventManager.GetDispatcher(eventType.GetType());
+            EventDispatcher dispatcher;
+            if (eventType is Type type)
+            {
+                dispatcher = EventManager.GetDispatcher(type);
+            }
+            else
+            {
+                dispatcher = EventManager.GetDispatcher(eventType.GetType());
+            }
+
             dispatcher.AddListener(eventType, Listener, method, group, priority, interrupt);
             if (!RegisteredDispatchers.Contains(dispatcher))
             {
