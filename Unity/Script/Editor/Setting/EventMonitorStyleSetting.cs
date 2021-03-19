@@ -25,6 +25,9 @@ namespace Aya.Events
         public Color TipListenColor;
         public Color TipSuccessColor;
         public Color TipFailColor;
+
+        [Header("Param")]
+        public string DateFormat = "yyyyMMdd HH:mm:ss";
     }
 }
 #endif

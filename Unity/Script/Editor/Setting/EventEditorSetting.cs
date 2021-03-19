@@ -45,6 +45,11 @@ namespace Aya.Events
 
         #endregion
 
+        [Header("Log")] 
+        public string DateFormat = "yyyyMMdd HH:mm:ss";
+        public int CacheLogCount = 1000;
+
+        [Header("Style")]
         public EventMonitorStyleSetting MonitorStyle;
     }
 }

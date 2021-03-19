@@ -42,9 +42,18 @@ namespace Aya.Events
         protected static void Init()
         {
             var ins = Ins;
-            UEventCallback.OnError += (eventHandler, exception) => Debug.LogError(exception.ToString());
+            UEventCallback.OnError += (eventHandler, args, exception) =>
+            {
+                Debug.LogError(exception.ToString());
 #if UNITY_EDITOR
-            UEventCallback.OnDispatched += EventHandler.CacheLog;
+                EventHandler.CacheLog(eventHandler, args, false, exception);
+#endif
+            };
+#if UNITY_EDITOR
+            UEventCallback.OnDispatched += (eventHandler, args) =>
+            {
+                EventHandler.CacheLog(eventHandler, args, true, null);
+            };
 #endif
         }
 

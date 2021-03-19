@@ -73,7 +73,7 @@ namespace Aya.Events
                 success = InvokeMethod(this, args);
             }
 
-            UEventCallback.OnDispatched?.Invoke(this, args, success);
+            UEventCallback.OnDispatched?.Invoke(this, args);
 
             return success;
         }
@@ -140,7 +140,7 @@ namespace Aya.Events
             }
             catch (Exception exception)
             {
-                UEventCallback.OnError?.Invoke(eventHandler, exception);
+                UEventCallback.OnError?.Invoke(eventHandler, args, exception);
                 return false;
             }
 

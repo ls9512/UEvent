@@ -6,8 +6,8 @@
 //  E-mail   : ls9512@vip.qq.com
 //
 /////////////////////////////////////////////////////////////////////////////
-
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
@@ -20,12 +20,13 @@ namespace Aya.Events
 
         #region Log
 
-        public int DispatchCounter => DispatchSuccessCounter + DispatchFailCounter;
-        public int DispatchSuccessCounter;
-        public int DispatchFailCounter;
-        public DateTime LastInvokeDateTime;
+        internal int DispatchCounter => DispatchSuccessCounter + DispatchFailCounter;
+        internal int DispatchSuccessCounter;
+        internal int DispatchFailCounter;
+        internal DateTime LastInvokeDateTime;
+        internal static List<EventLogData> Logs = new List<EventLogData>();
 
-        internal static void CacheLog(EventHandler eventHandler, object[] args, bool success)
+        internal static void CacheLog(EventHandler eventHandler, object[] args, bool success, Exception exception)
         {
             if (success)
             {
@@ -37,6 +38,33 @@ namespace Aya.Events
             }
 
             eventHandler.LastInvokeDateTime = DateTime.Now;
+
+            var log = new EventLogData
+            {
+                EventType = eventHandler.Type.ToString(),
+                DateTime = DateTime.Now,
+                Success = success,
+                Exception = exception,
+            };
+
+            log.Parameters = "[";
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i];
+                log.Parameters += arg;
+                if (i < args.Length - 1)
+                {
+                    log.Parameters += ",";
+                }
+            }
+
+            log.Parameters += "]";
+            Logs.Add(log);
+
+            if (Logs.Count > EventEditorSetting.Ins.CacheLogCount)
+            {
+                Logs.RemoveAt(0);
+            }
         }
 
         #endregion

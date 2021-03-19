@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Aya.Events
 {
@@ -34,7 +33,7 @@ namespace Aya.Events
             }
 
             Instance.Show();
-        } 
+        }
 
         #endregion
 
@@ -60,7 +59,24 @@ namespace Aya.Events
 
         public void OnGUI()
         {
-            DrawTable();
+            if (!Application.isPlaying)
+            {
+                GUILayout.Label("Player is not running", EditorStyles.largeLabel);
+            }
+            else
+            {
+                // GUIResizeArea.Vertical(
+                //     "EventMonitor",
+                //     position.width,
+                //     position.height,
+                //     DrawFilter,
+                //     DrawEventTable,
+                //     DrawLog);
+
+                DrawFilter();
+                DrawEventTable();
+                DrawLog();
+            }
         }
 
         public void Update()
@@ -100,9 +116,27 @@ namespace Aya.Events
 
         #endregion
 
-        #region Draw Table
-
+        #region Draw Filter
+       
         private string _searchEventType;
+
+        public void DrawFilter()
+        {
+            using (GUIFoldOut.Create(this, "Filter"))
+            {
+                if (!GUIFoldOut.GetState(this, "Filter")) return;
+                using (GUIHorizontal.Create())
+                {
+                    GUILayout.Label("Event Type", GUILayout.Width(EditorGUIUtility.labelWidth / 2f));
+                    _searchEventType = EditorGUILayout.TextArea(_searchEventType,
+                        EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
+                }
+            }
+        } 
+
+        #endregion
+
+        #region Draw Event Table
 
         private Action<int, float, EventHandler>[] _tableCellDrawers;
         private string[] _tableHeaders;
@@ -122,81 +156,44 @@ namespace Aya.Events
                 DrawCellCounter,
                 DrawCellLastTime,
             };
-
-            _tableHeaders = new[] {"Event", "Target", "Group", "Priority", "Interrupt", "Handler", "Dispatch", "Last Time"};
-            _tableCellWidthWeights = new[] {1.5f, 1.5f, 1f, 0.35f, 0.4f, 2.5f, 0.5f, 1f};
+            _tableHeaders = new[] { "Event", "Target", "Group", "Priority", "Interrupt", "Handler", "Dispatch", "Last Time" };
+            _tableCellWidthWeights = new[] { 1.5f, 1.5f, 1f, 0.35f, 0.4f, 2.5f, 0.5f, 1f };
         }
 
-        public void DrawTable()
+        public void DrawEventTable()
         {
-            if (!Application.isPlaying)
+            using (GUIFoldOut.Create(this, "Event"))
             {
-                GUILayout.Label("Player is not running", EditorStyles.largeLabel);
-            }
-            else
-            {
-                using (new GUIFoldOut(this, "Filter"))
+                if (!GUIFoldOut.GetState(this, "Event")) return;
+                using (GUIScrollView.Create(ref _tableScrollPos, GUILayout.Height(Screen.height * 0.6f / EditorGUIUtility.pixelsPerPoint)))
                 {
-                    if (GUIFoldOut.GetState(this, "Filter"))
-                    {
-                        using (new GUIHorizontal(null))
+                    var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
+                    using (new GUITable<EventHandler>(
+                        _tableHeaders,
+                        (rowIndex, columnWidths, eventHandler) =>
                         {
-                            GUILayout.Label("Event Type", GUILayout.Width(EditorGUIUtility.labelWidth / 2f));
-                            _searchEventType = EditorGUILayout.TextArea(_searchEventType,
-                                EditorStyles.toolbarSearchField, GUILayout.Width(EditorGUIUtility.labelWidth));
-                        }
-                    }
-                }
-
-                // Event Table
-                using (new GUIFoldOut(this, "Event"))
-                {
-                    if (GUIFoldOut.GetState(this, "Event"))
-                    {
-                        using (new GUIScrollView(ref _tableScrollPos))
-                        {
-                            var tableWidth = (Screen.width - 58f * EditorGUIUtility.pixelsPerPoint) / EditorGUIUtility.pixelsPerPoint;
-                            using (new GUITable<EventHandler>(
-                                _tableHeaders,
-                                (rowIndex, columnWidths, eventHandler) =>
+                            if (!string.IsNullOrEmpty(_searchEventType) && !eventHandler.Type.ToString().Contains(_searchEventType)) return;
+                            using (new GUIFullColorArea(GetRowColor(eventHandler)))
+                            {
+                                using (new GUITableRow(rowIndex))
                                 {
-                                    if (!string.IsNullOrEmpty(_searchEventType) && !eventHandler.Type.ToString().Contains(_searchEventType))
+                                    for (var i = 0; i < _tableCellDrawers.Length; i++)
                                     {
-                                        return;
-                                    }
-
-                                    using (new GUIFullColorArea(GetRowColor(eventHandler)))
-                                    {
-                                        using (new GUITableRow(rowIndex))
+                                        var cellWidth = columnWidths[i];
+                                        using (new GUITableCell(rowIndex, i, cellWidth))
                                         {
-                                            for (var i = 0; i < _tableCellDrawers.Length; i++)
-                                            {
-                                                var cellWidth = columnWidths[i];
-                                                using (new GUITableCell(rowIndex, i, cellWidth))
-                                                {
-                                                    _tableCellDrawers[i](rowIndex, cellWidth, eventHandler);
-                                                }
-                                            }
+                                            _tableCellDrawers[i](rowIndex, cellWidth, eventHandler);
                                         }
                                     }
-                                },
-                                ForeachRow(),
-                                tableWidth,
-                                _tableCellWidthWeights)
-                            )
-                            {
-                                GUI.enabled = true;
+                                }
                             }
-                        }
-                    }
-                }
-
-                // Log
-                using (new GUIFoldOut(this, "Log"))
-                {
-                    if (GUIFoldOut.GetState(this, "Log"))
+                        },
+                        ForeachRow(),
+                        tableWidth,
+                        _tableCellWidthWeights)
+                    )
                     {
-
+                        GUI.enabled = true;
                     }
                 }
             }
@@ -364,13 +361,46 @@ namespace Aya.Events
         {
             if (eventHandler.DispatchCounter > 0)
             {
-                GUILayout.Label(eventHandler.LastInvokeDateTime.ToString("yyyyMMdd HH:mm:ss"));
+                GUILayout.Label(eventHandler.LastInvokeDateTime.ToString(EventEditorSetting.Ins.MonitorStyle.DateFormat));
             }
             else
             {
                 using (new GUIColorArea(Color.gray))
                 {
                     GUILayout.Label("None");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Draw Log
+
+        private Vector2 _logScrollPos;
+
+        public void DrawLog()
+        {
+            using (GUIFoldOut.Create(this, "Log"))
+            {
+                if (!GUIFoldOut.GetState(this, "Log")) return;
+                using (GUIScrollView.Create(ref _logScrollPos))
+                {
+                    for (var i = EventHandler.Logs.Count - 1; i >= 0; i--)
+                    {
+                        var log = EventHandler.Logs[i];
+                        if (!string.IsNullOrEmpty(_searchEventType) && !log.EventType.Contains(_searchEventType)) return;
+                        if (log.Success)
+                        {
+                            EditorGUILayout.TextArea(log.ToString());
+                        }
+                        else
+                        {
+                            using (GUIContentColorArea.Create(Color.red))
+                            {
+                                EditorGUILayout.TextArea(log.ToString());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -391,192 +421,14 @@ namespace Aya.Events
 
         }
 
-        public void OnDispatched(EventHandler eventHandler, object[] args, bool success)
+        public void OnDispatched(EventHandler eventHandler, object[] args)
         {
-            if (success)
-            {
-                eventHandler.LastInvokeSuccessTime = Time.realtimeSinceStartup;
-            }
-            else
-            {
-                eventHandler.LastInvokeFailTime = Time.realtimeSinceStartup;
-            }
+            eventHandler.LastInvokeSuccessTime = Time.realtimeSinceStartup;
         }
 
-        public void OnError(EventHandler eventHandler, Exception exception)
+        public void OnError(EventHandler eventHandler, object[] args, Exception exception)
         {
-
-        }
-
-        #endregion
-
-        #region GUI Helper
-
-        public struct GUIFoldOut : IDisposable
-        {
-            public static Dictionary<Object, Dictionary<string, bool>> StateCacheDic = new Dictionary<Object, Dictionary<string, bool>>();
-
-            public GUIFoldOut(Object target, string title, bool defaultState = true, GUILayoutOption[] options = null)
-            {
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox, options);
-                var rect = EditorGUILayout.GetControlRect();
-
-                var state = GetState(target, title, defaultState);
-                var currentState = GUI.Toggle(rect, state, GUIContent.none, EditorStyles.foldout);
-                if (currentState != state)
-                {
-                    SetState(target, title, currentState);
-                }
-
-                rect.xMin += rect.height;
-                EditorGUI.LabelField(rect, title, EditorStyles.boldLabel);
-            }
-
-            public void Dispose()
-            {
-                EditorGUILayout.EndVertical();
-            }
-
-            public static bool GetState(Object target, string title, bool defaultState = true)
-            {
-                var stateDic = GetStateDic(target);
-                if (!stateDic.TryGetValue(title, out var result))
-                {
-                    stateDic.Add(title, defaultState);
-                }
-
-                return result;
-            }
-
-            public static void SetState(Object target, string title, bool value)
-            {
-                var stateDic = GetStateDic(target);
-                if (!stateDic.TryGetValue(title, out var result))
-                {
-                    stateDic.Add(title, value);
-                }
-                else
-                {
-                    stateDic[title] = value;
-                }
-            }
-
-            public static Dictionary<string, bool> GetStateDic(Object target)
-            {
-                if (!StateCacheDic.TryGetValue(target, out var stateDic))
-                {
-                    stateDic = new Dictionary<string, bool>();
-                    StateCacheDic.Add(target, stateDic);
-                }
-
-                return stateDic;
-            }
-        }
-
-        public struct GUITabArea : IDisposable
-        {
-            public GUITabArea(float tabSize, GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Space(tabSize);
-                GUILayout.BeginVertical(options);
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndVertical();
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        public struct GUIColorArea : IDisposable
-        {
-            public Color OriginalColor;
-
-            public GUIColorArea(Color color)
-            {
-                OriginalColor = GUI.color;
-                GUI.color = color;
-            }
-
-            public void Dispose()
-            {
-                GUI.color = OriginalColor;
-            }
-        }
-
-        public struct GUIFullColorArea : IDisposable
-        {
-            public Color OriginalBackColor;
-            public Color OriginalContentColor;
-
-            public GUIFullColorArea(Color color)
-            {
-                OriginalBackColor = GUI.backgroundColor;
-                GUI.backgroundColor = color;
-                OriginalContentColor = GUI.contentColor;
-                GUI.contentColor = color;
-            }
-
-            public void Dispose()
-            {
-                GUI.backgroundColor = OriginalBackColor;
-                GUI.contentColor = OriginalContentColor;
-            }
-        }
-
-        public struct GUIVertical : IDisposable
-        {
-            public GUIVertical(GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginVertical(options);
-            }
-
-            public GUIVertical(GUIStyle style, GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginVertical(style, options);
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndVertical();
-            }
-        }
-
-        public struct GUIHorizontal : IDisposable
-        {
-            public GUIHorizontal(GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginHorizontal(options);
-            }
-
-            public GUIHorizontal(GUIStyle style, GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginHorizontal(style, options);
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        public struct GUIScrollView : IDisposable
-        {
-            public GUIScrollView(ref Vector2 pos, GUILayoutOption[] options = null)
-            {
-                pos = GUILayout.BeginScrollView(pos, options);
-            }
-
-            public GUIScrollView(ref Vector2 pos, GUIStyle style, GUILayoutOption[] options = null)
-            {
-                GUILayout.BeginScrollView(pos, style, options);
-            }
-
-            public void Dispose()
-            {
-                GUILayout.EndScrollView();
-            }
+            eventHandler.LastInvokeFailTime = Time.realtimeSinceStartup;
         }
 
         #endregion

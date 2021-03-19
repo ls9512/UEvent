@@ -14,7 +14,7 @@ namespace Aya.Events
     {
         public static Action<EventHandler> OnAdded = delegate { };
         public static Action<EventHandler> OnRemoved = delegate { };
-        public static Action<EventHandler, object[], bool> OnDispatched = delegate { };
-        public static Action<EventHandler, Exception> OnError = (eventHandler, exception) => Console.WriteLine(exception.ToString());
+        public static Action<EventHandler, object[]> OnDispatched = delegate { };
+        public static Action<EventHandler, object[], Exception> OnError = (eventHandler, args, exception) => Console.WriteLine(exception.ToString());
     }
 }
