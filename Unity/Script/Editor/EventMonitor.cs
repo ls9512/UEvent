@@ -253,13 +253,20 @@ namespace Aya.Events
 
         public void DrawCellEventType(int index, float width, EventHandler eventHandler)
         {
-            if (eventHandler.Type is Type type)
+            if (eventHandler.DataType == EventDataType.Enum)
             {
-                GUILayout.Label(type.Name);
+                GUILayout.Label(eventHandler.Type.GetType().Name + "." + eventHandler.Type);
             }
             else
             {
-                GUILayout.Label(eventHandler.Type.ToString());
+                if (eventHandler.Type is Type type)
+                {
+                    GUILayout.Label("[" + eventHandler.DataType + "] " + type.Name);
+                }
+                else
+                {
+                    GUILayout.Label("[" + eventHandler.DataType + "] " + eventHandler.Type);
+                }
             }
         }
 

@@ -6,6 +6,7 @@
 //  E-mail   : ls9512@vip.qq.com
 //
 /////////////////////////////////////////////////////////////////////////////
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,9 +15,48 @@ using UnityEngine;
 
 namespace Aya.Events
 {
+    public enum EventDataType
+    {
+        Enum = 0,
+        String = 1,
+        Class = 2,
+        Struct = 3,
+    }
+
     public partial class EventHandler
     {
-#if UNITY_EDITOR
+        #region Editor Property
+
+        internal EventDataType DataType
+        {
+            get
+            {
+                if (_dataType == null)
+                {
+                    if (Type is Type type)
+                    {
+                        _dataType = type.IsValueType ? EventDataType.Struct : EventDataType.Class;
+                    }
+                    else
+                    {
+                        if (Type is string eventStr)
+                        {
+                            _dataType = EventDataType.String;
+                        }
+                        else
+                        {
+                            _dataType = EventDataType.Enum;
+                        }
+                    }
+                }
+
+                return _dataType.Value;
+            }
+        }
+
+        private EventDataType? _dataType;
+
+        #endregion
 
         #region Log
 
@@ -209,7 +249,6 @@ namespace Aya.Events
 
 
         #endregion
-
-#endif
     }
 }
+#endif
