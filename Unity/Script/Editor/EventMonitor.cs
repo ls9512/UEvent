@@ -91,33 +91,10 @@ namespace Aya.Events
 
         #region Style
 
-        public static GUIStyle RichTextStyle
-        {
-            get
-            {
-                if (_richTextStyle == null)
-                {
-                    _richTextStyle = new GUIStyle()
-                    {
-                        normal = new GUIStyleState()
-                        {
-                            textColor = Color.white
-                        },
-                        alignment = TextAnchor.MiddleLeft,
-                        richText = true
-                    };
-                }
-
-                return _richTextStyle;
-            }
-        }
-
-        private static GUIStyle _richTextStyle;
-
         #endregion
 
         #region Draw Filter
-       
+
         private string _searchEventType;
 
         public void DrawFilter()
@@ -333,7 +310,10 @@ namespace Aya.Events
         {
             if (eventHandler.Method != null)
             {
-                GUILayout.Label(eventHandler.MethodSignature, RichTextStyle);
+                GUIHelper.Url(eventHandler.MethodSignatureRichText, eventHandler.MethodSignature, () =>
+                {
+
+                });
             }
             else
             {

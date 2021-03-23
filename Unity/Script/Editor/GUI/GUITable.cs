@@ -9,6 +9,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Aya.Events
@@ -80,18 +81,46 @@ namespace Aya.Events
 
                 index++;
             }
+
+            // GUILayout.FlexibleSpace();
+            // DrawBottom();
         }
 
         public void DrawHeader(string[] headers, float[] columnWidths)
         {
-            GUILayout.BeginHorizontal(HeaderStyle);
-            for (var i = 0; i < headers.Length; i++)
+            using (new GUIHorizontal(HeaderStyle))
             {
-                var header = headers[i];
-                GUILayout.Label(header, GUILayout.Width(columnWidths[i]));
+                for (var i = 0; i < headers.Length; i++)
+                {
+                    var header = headers[i];
+                    GUILayout.Label(header, GUILayout.Width(columnWidths[i]));
+                }
             }
+        }
 
-            GUILayout.EndHorizontal();
+        public void DrawBottom()
+        {
+            using (new GUIHorizontal(HeaderStyle, GUILayout.Height(EditorGUIUtility.singleLineHeight)))
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.Button("←", GUILayout.Width(30));
+                GUILayout.TextArea("1", GUILayout.Width(20));
+                GUILayout.Label("/100", GUILayout.Width(20));
+                GUILayout.Button("→", GUILayout.Width(30));
+
+                if(GUILayout.Button("10", GUILayout.Width(40)))
+                {
+                    var pageRowMenu = new GenericMenu();
+                    pageRowMenu.AddItem(new GUIContent("10"), true, () => { });
+                    pageRowMenu.AddItem(new GUIContent("20"), false, () => { });
+                    pageRowMenu.AddItem(new GUIContent("50"), false, () => { });
+                    pageRowMenu.AddItem(new GUIContent("100"), false, () => { });
+                    pageRowMenu.AddItem(new GUIContent("200"), false, () => { });
+                    pageRowMenu.AddItem(new GUIContent("500"), false, () => { });
+                    pageRowMenu.AddItem(new GUIContent("1000"), false, () => { });
+                    pageRowMenu.ShowAsContext();
+                }
+            }
         }
 
         public float[] CalcColumnWidths(float tableWidth, float[] columnWidthWeights)

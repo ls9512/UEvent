@@ -16,3 +16,8 @@ MonoBehaviour:
   CodeTypeColor: {r: 0.30588236, g: 0.78823537, b: 0.6901961, a: 1}
   CodeMethodColor: {r: 0.86274517, g: 0.86274517, b: 0.63529414, a: 1}
   CodeParameterColor: {r: 0.6117647, g: 0.86274517, b: 0.9803922, a: 1}
+  CodeNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  TipListenColor: {r: 0, g: 1, b: 1, a: 1}
+  TipSuccessColor: {r: 0, g: 1, b: 0, a: 1}
+  TipFailColor: {r: 1, g: 0, b: 0, a: 1}
+  DateFormat: yyyyMMdd HH:mm:ss

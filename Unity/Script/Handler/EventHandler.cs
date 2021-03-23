@@ -135,7 +135,7 @@ namespace Aya.Events
             {
                 if (string.IsNullOrEmpty(_methodSignature))
                 {
-                    _methodSignature = GetSignature(Method);
+                    _methodSignature = GetSignature(Method, false);
                 }
 
                 return _methodSignature;
@@ -143,7 +143,21 @@ namespace Aya.Events
         }
         private string _methodSignature;
 
-        private string GetSignature(MethodInfo methodInfo)
+        internal string MethodSignatureRichText
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_methodSignatureRichText))
+                {
+                    _methodSignatureRichText = GetSignature(Method, true);
+                }
+
+                return _methodSignatureRichText;
+            }
+        }
+        private string _methodSignatureRichText;
+
+        private string GetSignature(MethodInfo methodInfo, bool richText)
         {
             if (methodInfo == null)
             {
@@ -152,7 +166,7 @@ namespace Aya.Events
 
             var stringBuilder = new StringBuilder();
 
-            stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeKeyWordColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeKeyWordColor));
             if (methodInfo.IsPrivate)
             {
                 stringBuilder.Append("private ");
@@ -188,39 +202,40 @@ namespace Aya.Events
                 stringBuilder.Append("virtual ");
             }
 
-            stringBuilder.Append(GetColorMarkupEnd());
+            if (richText) stringBuilder.Append(GetColorMarkupEnd());
 
-            stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
             stringBuilder.Append(methodInfo.ReturnType.Name);
-            stringBuilder.Append(GetColorMarkupEnd());
+            if (richText) stringBuilder.Append(GetColorMarkupEnd());
             stringBuilder.Append(" ");
 
-            stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeMethodColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeMethodColor));
             stringBuilder.Append(methodInfo.Name);
-            stringBuilder.Append(GetColorMarkupEnd());
-            stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+            if (richText) stringBuilder.Append(GetColorMarkupEnd());
+            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
             stringBuilder.Append("(");
-            stringBuilder.Append(GetColorMarkupEnd());
+            if (richText) stringBuilder.Append(GetColorMarkupEnd());
             var parameters = methodInfo.GetParameters();
             for (var i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
+                if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
                 stringBuilder.Append(parameter.ParameterType.Name);
-                stringBuilder.Append(GetColorMarkupEnd());
+                if (richText) stringBuilder.Append(GetColorMarkupEnd());
                 stringBuilder.Append(" ");
-                stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+                if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
                 stringBuilder.Append(parameter.Name);
                 if (i < parameters.Length - 1)
                 {
                     stringBuilder.Append(",");
                 }
-                stringBuilder.Append(GetColorMarkupEnd());
+
+                if (richText) stringBuilder.Append(GetColorMarkupEnd());
             }
 
-            stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
             stringBuilder.Append(")");
-            stringBuilder.Append(GetColorMarkupEnd());
+            if (richText) stringBuilder.Append(GetColorMarkupEnd());
             return stringBuilder.ToString();
         }
 

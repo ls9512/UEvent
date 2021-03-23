@@ -15,6 +15,7 @@ namespace Aya.Events
     public class EventMonitorStyleSetting : ScriptableObject
     {
         [Header("Code Color")]
+        public Color ActiveUrlColor;
         public Color CodeKeyWordColor;
         public Color CodeTypeColor;
         public Color CodeMethodColor;

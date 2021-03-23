@@ -17,6 +17,56 @@ namespace Aya.Events
 {
     internal static class GUIHelper
     {
+        public static GUIStyle LinkNormalStyle
+        {
+            get
+            {
+                if (_linkNormalStyle == null)
+                {
+                    _linkNormalStyle = new GUIStyle()
+                    {
+                        normal = new GUIStyleState()
+                        {
+                            textColor = Color.white
+                        },
+                        alignment = TextAnchor.MiddleLeft,
+                        richText = true
+                    };
+                }
+
+                return _linkNormalStyle;
+            }
+        }
+
+        private static GUIStyle _linkNormalStyle;
+
+        public static GUIStyle LinkActiveStyle
+        {
+            get
+            {
+                if (_linkActiveStyle == null)
+                {
+                    _linkActiveStyle = new GUIStyle()
+                    {
+                        active = new GUIStyleState()
+                        {
+                            textColor = Color.blue
+                        },
+                        normal = new GUIStyleState()
+                        {
+                            textColor = EventEditorSetting.Ins.MonitorStyle.ActiveUrlColor
+                        },
+                        alignment = TextAnchor.MiddleLeft,
+                        richText = false
+                    };
+                }
+
+                return _linkActiveStyle;
+            }
+        }
+
+        private static GUIStyle _linkActiveStyle;
+
         public static Texture2D MakeTex(int width, int height, Color col)
         {
             var pix = new Color[width * height];
@@ -31,6 +81,28 @@ namespace Aya.Events
             result.Apply();
 
             return result;
+        }
+
+        public static bool Url(string normalUrl, string activeUrl, Action action = null)
+        {
+            var rect = EditorGUILayout.GetControlRect();
+            if (rect.Contains(Event.current.mousePosition))
+            {
+                EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
+                GUI.Label(rect, activeUrl, LinkActiveStyle);
+                if (Event.current.type == EventType.MouseUp)
+                {
+                    action?.Invoke();
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                GUI.Label(rect, normalUrl, LinkNormalStyle);
+                return false;
+            }
         }
     }
 
