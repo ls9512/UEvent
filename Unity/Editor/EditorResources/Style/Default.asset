@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb47cc5e61fca784ca691e3bfccf1d98, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: 
+  ActiveUrlColor: {r: 0, g: 0.74053, b: 1, a: 1}
   CodeKeyWordColor: {r: 0.26666668, g: 0.5254902, b: 0.8117648, a: 1}
   CodeTypeColor: {r: 0.30588236, g: 0.78823537, b: 0.6901961, a: 1}
   CodeMethodColor: {r: 0.86274517, g: 0.86274517, b: 0.63529414, a: 1}

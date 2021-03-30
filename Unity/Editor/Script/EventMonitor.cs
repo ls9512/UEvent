@@ -9,6 +9,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -312,7 +313,7 @@ namespace Aya.Events
             {
                 GUIHelper.Url(eventHandler.MethodSignatureRichText, eventHandler.MethodSignature, () =>
                 {
-
+                    // EditorUtility.OpenWithDefaultApp();
                 });
             }
             else
