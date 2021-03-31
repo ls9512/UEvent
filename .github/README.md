@@ -56,14 +56,14 @@
 <!-- /vscode-markdown-toc -->
 ##  1. <a name='Introduction'></a>Introduction
 ###  1.1. <a name='Environment'></a>Environment
-* Unity : 2017+
-* .Net : 4.x+
+![Unity: 2019.4.3f1](https://img.shields.io/badge/Unity-2017+-blue) 
+![.NET 4.x](https://img.shields.io/badge/.NET-4.x-blue) 
 
 ###  1.2. <a name='Folder'></a>Folder
-* **Example**: Example folder. It can be deleted in the you project to reduce space consumption.
-* **Script / CSharp**: The core fully implemented by .Net, can be used independently in .Net environment.
-* **Script / Unity**:  The additional functions implemented by unity class library, you need to work with the code in the core folder when working in unity environment.
-* **Script / * / Ext**: Temporary implementation code for compatibility with string / class / struct type events, which may be replaced later.
+* **Samples**: Example folder. It can be deleted in the you project to reduce space consumption.
+* **CSharp**: The core fully implemented by .Net, can be used independently in .Net environment.
+* **Unity**:  The additional functions implemented by unity class library, you need to work with the code in the core folder when working in unity environment.
+* **\*/Ext**: Temporary implementation code for compatibility with string / class / struct type events, which may be replaced later.
 
 ###  1.3. <a name='Feature'></a>Feature
 * Support to define multiple groups of events through enumeration, and monitor by single event or by event type.

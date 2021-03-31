@@ -56,14 +56,14 @@
 <!-- /vscode-markdown-toc -->
 ##  1. <a name=''></a>简介
 ###  1.1. <a name='-1'></a>环境
-* Unity : 2017+
-* .Net : 4.x+
+![Unity: 2019.4.3f1](https://img.shields.io/badge/Unity-2017+-blue) 
+![.NET 4.x](https://img.shields.io/badge/.NET-4.x-blue) 
 
 ###  1.2. <a name='-1'></a>文件夹
-* **Example**: 例程文件夹，实际项目中可删除以减小空间占用。
-* **Script / CSharp**: 完全 .Net 实现的核心功能部分，可在 .Net 环境下独立使用。
-* **Script / Unity**: 依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
-* **Script / * / Ext**: 用来兼容 string / class / struct 类型事件的临时实现代码，以后可能被替换。
+* **Samples**: 例程文件夹，实际项目中可删除以减小空间占用。
+* **CSharp**: 完全 .Net 实现的核心功能部分，可在 .Net 环境下独立使用。
+* **Unity**: 依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
+* **\*/Ext**: 用来兼容 string / class / struct 类型事件的临时实现代码，以后可能被替换。
 
 ###  1.3. <a name='-1'></a>特性
 * 支持通过枚举定义多组事件，按单一事件或者按事件类型进行监听。

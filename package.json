@@ -16,7 +16,17 @@
   },
   "dependencies": {},
   "keywords": [
-    "Animation",
-    "UI"
+    "Frameworks",
+    "Event",
+    "Message",
+    "Testing",
+    "Data-Driven"
+  ],
+  "samples": [
+    {
+      "displayName": "Samples",
+      "description": "Samples",
+      "path": "Samples~"
+    }
   ]
 }
