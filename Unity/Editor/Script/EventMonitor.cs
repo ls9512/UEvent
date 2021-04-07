@@ -150,7 +150,7 @@ namespace Aya.Events
                         _tableHeaders,
                         (rowIndex, columnWidths, eventHandler) =>
                         {
-                            if (!string.IsNullOrEmpty(_searchEventType) && !eventHandler.Type.ToString().Contains(_searchEventType)) return;
+                            if (!string.IsNullOrEmpty(_searchEventType) && !eventHandler.EventType.ToString().Contains(_searchEventType)) return;
                             using (new GUIFullColorArea(GetRowColor(eventHandler)))
                             {
                                 using (new GUITableRow(rowIndex))
@@ -233,17 +233,17 @@ namespace Aya.Events
         {
             if (eventHandler.DataType == EventDataType.Enum)
             {
-                GUILayout.Label(eventHandler.Type.GetType().Name + "." + eventHandler.Type);
+                GUILayout.Label(eventHandler.EventType.GetType().Name + "." + eventHandler.EventType);
             }
             else
             {
-                if (eventHandler.Type is Type type)
+                if (eventHandler.EventType is Type type)
                 {
                     GUILayout.Label("[" + eventHandler.DataType + "] " + type.Name);
                 }
                 else
                 {
-                    GUILayout.Label("[" + eventHandler.DataType + "] " + eventHandler.Type);
+                    GUILayout.Label("[" + eventHandler.DataType + "] " + eventHandler.EventType);
                 }
             }
         }
@@ -409,12 +409,12 @@ namespace Aya.Events
 
         }
 
-        public void OnDispatched(EventHandler eventHandler, object[] args)
+        public void OnDispatched(EventHandler eventHandler, object eventType, object[] args)
         {
             eventHandler.LastInvokeSuccessTime = Time.realtimeSinceStartup;
         }
 
-        public void OnError(EventHandler eventHandler, object[] args, Exception exception)
+        public void OnError(EventHandler eventHandler, object eventType, object[] args, Exception exception)
         {
             eventHandler.LastInvokeFailTime = Time.realtimeSinceStartup;
         }

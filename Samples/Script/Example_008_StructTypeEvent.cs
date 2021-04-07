@@ -19,7 +19,7 @@ namespace Aya.Example
                 Message = "Message 01"
             };
 
-            UEvent<StructEventDefine>.Dispatch(evt);
+            UEvent.Dispatch(evt);
         }
 
         [Listen(typeof(StructEventDefine))]
@@ -32,14 +32,14 @@ namespace Aya.Example
 
         public void Test02()
         {
-            UEvent<StructEventDefine>.Listen(Receive02);
+            UEvent.Listen<StructEventDefine>(Receive02);
 
-            UEvent<StructEventDefine>.Dispatch(new StructEventDefine()
+            UEvent.Dispatch(new StructEventDefine()
             {
                 Message = "Message 02"
             });
 
-            UEvent<StructEventDefine>.Remove(Receive02);
+            UEvent.Remove<StructEventDefine>(Receive02);
         }
 
         public void Receive02(StructEventDefine evt)

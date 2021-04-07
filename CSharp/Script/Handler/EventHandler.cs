@@ -19,7 +19,12 @@ namespace Aya.Events
         /// <summary>
         /// 事件类型
         /// </summary>
-        public object Type { get; set; }
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// 事件类型值
+        /// </summary>
+        public object EventType { get; set; }
 
         /// <summary>
         /// 事件目标对象
@@ -59,22 +64,17 @@ namespace Aya.Events
         #endregion
 
         #region Invoke
-        
+
         /// <summary>
         /// 执行事件
         /// </summary>
+        /// <param name="eventType">事件类型值</param>
         /// <param name="args">参数</param>
         /// <returns>执行结果</returns>
-        public virtual bool Invoke(params object[] args)
+        public virtual bool Invoke(object eventType, params object[] args)
         {
-            var success = false;
-            if (Method != null)
-            {
-                success = InvokeMethod(this, args);
-            }
-
-            UEventCallback.OnDispatched?.Invoke(this, args);
-
+            var success = InvokeMethod(this, eventType, args);
+            UEventCallback.OnDispatched?.Invoke(this, eventType, args);
             return success;
         }
 
@@ -82,15 +82,14 @@ namespace Aya.Events
         /// 执行监听方法
         /// </summary>
         /// <param name="eventHandler">监听事件数据</param>
+        /// <param name="eventType">事件类型值</param>
         /// <param name="args">事件参数</param>
         /// <returns>执行结果</returns>
-        internal static bool InvokeMethod(EventHandler eventHandler, params object[] args)
+        internal static bool InvokeMethod(EventHandler eventHandler, object eventType, params object[] args)
         {
-            var eventType = eventHandler.Type;
             var method = eventHandler.Method;
             var parameters = eventHandler.Parameters;
             var target = eventHandler.Target;
-
             if (method == null || target == null) return false;
 
             try
@@ -102,14 +101,20 @@ namespace Aya.Events
                 }
                 else
                 {
-                    // 自动附加第一个事件类型参数
-                    var needEventTypeArg = parameters[0].Name == "eventType";
-                    var argIndexOffset = needEventTypeArg ? 1 : 0;
+                    // Auto first param
+                    var needEventTypeArg = parameters[0].Name == "eventType" || parameters[0].ParameterType == eventHandler.Type;
+                    var argIndexOffset = 0;
+                    argIndexOffset += needEventTypeArg ? 1 : 0;
 
                     if (parameters.Length == 1 + argIndexOffset && parameters[argIndexOffset].ParameterType == typeof(object[]))
                     {
-                        // params object[]
+                        // params eventType, object[]
                         returnValue = method.Invoke(target, needEventTypeArg ? new object[] { eventType, args } : new object[] { args });
+                    }
+                    else if (parameters.Length == argIndexOffset && needEventTypeArg)
+                    {
+                        // params eventType
+                        returnValue = method.Invoke(target, new object[] {eventType});
                     }
                     else if (parameters.Length == args.Length)
                     {
@@ -140,11 +145,35 @@ namespace Aya.Events
             }
             catch (Exception exception)
             {
-                UEventCallback.OnError?.Invoke(eventHandler, args, exception);
+                UEventCallback.OnError?.Invoke(eventHandler, eventType, args, exception);
                 return false;
             }
 
             return true;
+        }
+
+        #endregion
+
+        #region Internal
+        
+        internal static Type GetInternalType(object eventType)
+        {
+            if (eventType is Type type)
+            {
+                return type;
+            }
+
+            return eventType.GetType();
+        }
+
+        internal static object GetInternalEventType(object eventType)
+        {
+            if (eventType is Enum || eventType is string || eventType is Type)
+            {
+                return eventType;
+            }
+
+            return eventType.GetType();
         } 
 
         #endregion

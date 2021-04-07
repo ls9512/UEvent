@@ -33,13 +33,13 @@ namespace Aya.Events
             {
                 if (_dataType == null)
                 {
-                    if (Type is Type type)
+                    if (EventType is Type type)
                     {
                         _dataType = type.IsValueType ? EventDataType.Struct : EventDataType.Class;
                     }
                     else
                     {
-                        if (Type is string eventStr)
+                        if (EventType is string eventStr)
                         {
                             _dataType = EventDataType.String;
                         }
@@ -66,7 +66,7 @@ namespace Aya.Events
         internal DateTime LastInvokeDateTime;
         internal static List<EventLogData> Logs = new List<EventLogData>();
 
-        internal static void CacheLog(EventHandler eventHandler, object[] args, bool success, Exception exception)
+        internal static void CacheLog(EventHandler eventHandler, object eventType, object[] args, bool success, Exception exception)
         {
             if (success)
             {
@@ -81,7 +81,7 @@ namespace Aya.Events
 
             var log = new EventLogData
             {
-                EventType = eventHandler.Type.ToString(),
+                EventType = eventHandler.EventType.ToString(),
                 DateTime = DateTime.Now,
                 Success = success,
                 Exception = exception,

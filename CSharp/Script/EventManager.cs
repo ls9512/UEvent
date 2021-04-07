@@ -18,7 +18,7 @@ namespace Aya.Events
         #region Property
 
         /// <summary>
-        /// 事件枚举的类型 - 事件分发器 字典
+        /// 事件类型 - 事件分发器 字典
         /// </summary>
         internal static readonly Dictionary<Type, EventDispatcher> DispatcherDic;
 
@@ -46,25 +46,25 @@ namespace Aya.Events
         /// <returns>事件分发器</returns>
         public static EventDispatcher GetDispatcher<T>()
         {
-            var eventType = typeof(T);
-            return GetDispatcher(eventType);
+            var type = typeof(T);
+            return GetDispatcher(type);
         }
 
         /// <summary>
         /// 获取事件分发器
         /// </summary>
-        /// <param name="eventType">事件枚举类型</param>
+        /// <param name="type">事件类型</param>
         /// <returns>事件分发器</returns>
-        public static EventDispatcher GetDispatcher(Type eventType)
+        public static EventDispatcher GetDispatcher(Type type)
         {
-            if (DispatcherDic.ContainsKey(eventType))
+            if (DispatcherDic.ContainsKey(type))
             {
-                return DispatcherDic[eventType];
+                return DispatcherDic[type];
             }
             else
             {
-                var dispatcher = new EventDispatcher(eventType);
-                DispatcherDic[eventType] = dispatcher;
+                var dispatcher = new EventDispatcher(type);
+                DispatcherDic[type] = dispatcher;
                 return dispatcher;
             }
         }
