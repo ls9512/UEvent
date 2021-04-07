@@ -14,7 +14,7 @@
 <!-- vscode-markdown-toc -->
 * 1. [简介](#)
 	* 1.1. [环境](#-1)
-	* 1.2. [文件](#-1)
+	* 1.2. [文件夹](#-1)
 	* 1.3. [特性](#-1)
 	* 1.4. [结构](#-1)
 	* 1.5. [约定](#-1)
@@ -25,7 +25,9 @@
 	* 2.3. [事件监听器 EventListener](#EventListener)
 	* 2.4. [Object 事件监听器 ObjectListener](#ObjectObjectListener)
 	* 2.5. [Unity MonoBehaviour 事件监听器 MonoListener](#UnityMonoBehaviourMonoListener)
-	* 2.6. [监听事件处理器 EventHander](#EventHander)
+	* 2.6. [监听事件处理器 EventHandler](#EventHandler)
+		* 2.6.1. [EventHandler](#EventHandler-1)
+		* 2.6.2. [EventHandler\<T\>](#EventHandlerT)
 * 3. [可选特性标签 Attribute](#Attribute)
 	* 3.1. [事件定义枚举 EventEnumAttribute](#EventEnumAttribute)
 	* 3.2. [事件监听 ListenAttribute](#ListenAttribute)
@@ -82,7 +84,7 @@
 * 每一种类型的事件，使用一种枚举类型比如: AppEvent, GameEvent 等等，每种事件类型会对应一个 事件分发器 实例。
 * 可以每个项目只使用一种事件类型，但不推荐。
 * 方法型监听需要指定绑定对象，而委托型监听不需要指定对象。
-* 委托类型的监听方法，参数使用通用的 **object[]** 形式，因而需要指定 **eventType** 来进行处理，所以委托强制约定格式为 **Action<T, object[]>**。
+* 委托类型的监听方法，如果有参数，则参数使用通用 **object[]** 形式，因而可能需要指定 **eventType** 来进行处理。
 * 推荐通过多个事件枚举来对事件进行分组，通过监听分组特性来对监听方法进行分组。
 * 当接受事件的方法第一个参数名为 **eventType** 时，会自动发送事件类型，其他参数依次后移。可用于处理需要区分多个事件触发同一方法的情况。
 * **enum** / **string** 类型事件使用 **UEvent** 接口，**class** / **struct** 类型事件使用 **UEvent\<T\>** 接口，接口没有做完整的类型约束，但请务必按照约定调用以避免不可预期的问题。
@@ -110,15 +112,26 @@
 ###  2.5. <a name='UnityMonoBehaviourMonoListener'></a>Unity MonoBehaviour 事件监听器 MonoListener
 与 ObjectListener 接口相同，提供给 MonoBehaviour 游戏对象使用。
 
-###  2.6. <a name='EventHander'></a>监听事件处理器 EventHandler
-* **Type** : 事件类型
-* **Group** : 监听分组
-* **Target** : 事件目标对象，可空
-* **Priority** : 优先级
-* **Interrupt** : 是否中断事件队列
-* **Method** : 监听方法
-* **Parameters** ：监听方法的参数
-* **Action<T, object[]>** : 监听委托
+###  2.6. <a name='EventHandler'></a>监听事件处理器 EventHandler
+####  2.6.1. <a name='EventHandler-1'></a>EventHandler
+|属性|描述|备注|
+|-|-|-|
+|Type|事件定义类型|事件定义 `enum/string/class/struct` 等对象的 Type，相当于 `typeof(X)`|
+|EventType|监听事件的值|1.对于 `enum/string` 类型事件，则表示具体的枚举值；2.对于 `class/struct` 事件，在监听器的分组定义中同样表现为 `Type`，但实际发送事件时表现该类型的一个实例，可以包含事件内容。|
+|Group|监听分组||
+|Target|事件目标对象||
+|Priority|优先级||
+|Interrupt|是否中断事件队列||
+|Method|监听方法|对于无参数委托形式的监听，会自动将委托转换为 MehtodInfo 执行|
+|Parameters|监听方法的参数||
+|Action|监听委托 Action||
+
+####  2.6.2. <a name='EventHandlerT'></a>EventHandler\<T\>
+|属性|描述|备注|
+|-|-|-|
+|ActionT|监听委托 Action\<T\>||
+|ActionArgs|监听委托 Action\<obj[]\>||
+|ActionTArgs|监听委托 Action\<T, object[]\>||
 
 ***
 

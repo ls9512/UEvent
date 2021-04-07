@@ -21,17 +21,17 @@ namespace Aya.Events
         /// <param name="args">事件参数</param>
         public void DispatchSafe<T>(T eventType, params object[] args)
         {
-            var handlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
-            var eventList = handlerGroup.Handlers;
-            for (var i = 0; i < eventList.Count; i++)
+            var eventHandlerGroup = _getOrAddHandlerGroup(EventDic, eventType);
+            var eventHandlers = eventHandlerGroup.Handlers;
+            for (var i = 0; i < eventHandlers.Count; i++)
             {
-                var eventData = eventList[i];
-                lock (eventData)
+                var eventHandler = eventHandlers[i];
+                lock (eventHandler)
                 {
-                    EventManager.ExecuteUpdate(() => { eventData.Invoke(args); });
+                    EventManager.ExecuteUpdate(() => { eventHandler.Invoke(eventType, args); });
                 }
 
-                if (eventData.Interrupt) break;
+                if (eventHandler.Interrupt) break;
             }
         }
 

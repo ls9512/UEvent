@@ -26,6 +26,8 @@
 	* 2.4. [Object  Listener](#ObjectListener)
 	* 2.5. [Unity MonoListener](#UnityMonoListener)
 	* 2.6. [Event Handler](#EventHandler)
+		* 2.6.1. [EventHandler](#EventHandler-1)
+		* 2.6.2. [EventHandler\<T\>](#EventHandlerT)
 * 3. [Optional Attribute](#OptionalAttribute)
 	* 3.1. [ EventEnumAttribute](#EventEnumAttribute)
 	* 3.2. [ListenAttribute](#ListenAttribute)
@@ -82,7 +84,7 @@
 * For each type of event, use an enumerated type such as AppEvent, GameEvent, etc. Each event type corresponds to an event dispatcher instance.
 * It is possible to use only one event type per project, but it is not recommended.
 * Method-type listener needs to specify the binding object, while delegate-type listener does not need to specify the object.
-* For the listen method of the delegate type, the parameters use the general **object[]** form, so **eventType** needs to be specified for processing, so the mandatory convention format of the delegate is **Action<T, object[]>**.
+* For the listen method of the delegate type, if there are parameters, the parameters use the general **object[]** form, so **eventType** may need to be specified for processing.
 * It is recommended to group events through multiple event enumerations, and group monitoring methods through the **ListenGroupAttribute**.
 * When the first parameter of the method that receives the event is named **eventType**, the event type is automatically sent, and the other parameters are shifted backward in turn. It can be used to handle situations where multiple events trigger the same method.
 * **enum** / **string** type events use the **UEvent** interface, **class** / **struct** type events use the **UEvent\<T\>** interface, the interface does not do Complete type constraints, but be sure to call in accordance with the convention to avoid unexpected problems.
@@ -111,14 +113,24 @@ The user class implements the event mechanism by inheriting the class or initial
 Same as ObjectListener's interface，uesd for MonoBehaviour GameObject.
 
 ###  2.6. <a name='EventHandler'></a>Event Handler
-* **Type** : Event type
-* **Group** : Listen Group
-* **Target** : Event target / receiver
-* **Priority** : Priority
-* **Interrupt** : Interrupt event queue
-* **Method** : Listen method
-* **Parameters** ：Listen method's parameters
-* **Action<T, object[]>** : Listen delegate method
+####  2.6.1. <a name='EventHandler-1'></a>EventHandler
+|Property|Description|Remarks|
+|-|-|-|
+|Type|Event definition object type|Event definition `enum/string/class/struct` and other objects Type, equivalent to `typeof(X)`|
+|EventType|The value of the listener event|1. For `enum/string` type events, it represents the specific enum value; 2. For `class/struct` events, it also appears as `Type` in the grouping definition of the listener, but it is actually An instance of this type is represented when the event is sent, and the content of the event can be included. |
+|Group|Monitor group||
+|Target|Event target object||
+|Priority|Priority||
+|Interrupt|Whether to interrupt the event queue||
+|Method|Listen method|For the non-parameter delegated listening, the delegate will be automatically converted to MehtodInfo for execution|
+|Parameters|Parameters of the listen method||
+|Action|Listen delegate Action||
+####  2.6.2. <a name='EventHandlerT'></a>EventHandler\<T\>
+|Property|Description|Remarks|
+|-|-|-|
+|ActionT|Listen delegate Action\<T\>||
+|ActionArgs|Listen delegate Action\<obj[]\>||
+|ActionTArgs|Listen delegate Action\<T, object[]\>||
 
 ***
 
