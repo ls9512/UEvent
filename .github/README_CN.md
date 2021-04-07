@@ -63,7 +63,6 @@
 * **Samples**: 例程文件夹，实际项目中可删除以减小空间占用。
 * **CSharp**: 完全 .Net 实现的核心功能部分，可在 .Net 环境下独立使用。
 * **Unity**: 依赖 UnityEngine 等 Unity 类库实现的额外功能，在 Unity 环境中工作时需要配合 Core 文件夹中的代码一起使用。
-* **\*/Ext**: 用来兼容 string / class / struct 类型事件的临时实现代码，以后可能被替换。
 
 ###  1.3. <a name='-1'></a>特性
 * 支持通过枚举定义多组事件，按单一事件或者按事件类型进行监听。
@@ -341,7 +340,7 @@ public class ClassEventDefine
 UEvent<ClassEventDefine>.Listen(Receive);
 
 // 发送
-UEvent<ClassEventDefine>.Dispatch(new ClassEventDefine()
+UEvent.Dispatch(new ClassEventDefine()
 {
 	Message = "Message"
 });

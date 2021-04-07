@@ -63,7 +63,6 @@
 * **Samples**: Example folder. It can be deleted in the you project to reduce space consumption.
 * **CSharp**: The core fully implemented by .Net, can be used independently in .Net environment.
 * **Unity**:  The additional functions implemented by unity class library, you need to work with the code in the core folder when working in unity environment.
-* **\*/Ext**: Temporary implementation code for compatibility with string / class / struct type events, which may be replaced later.
 
 ###  1.3. <a name='Feature'></a>Feature
 * Support to define multiple groups of events through enumeration, and monitor by single event or by event type.
@@ -341,7 +340,7 @@ public class ClassEventDefine
 UEvent<ClassEventDefine>.Listen(Receive);
 
 // Dispatch event
-UEvent<ClassEventDefine>.Dispatch(new ClassEventDefine()
+UEvent.Dispatch(new ClassEventDefine()
 {
 	Message = "Message"
 });
