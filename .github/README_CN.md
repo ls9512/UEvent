@@ -2,10 +2,11 @@
 
 **UEvent** 是一个可以使用在Unity和原生.Net环境下的通用消息事件组件，通过事件机制可以提供强大的解耦能力。
 
+![license](https://img.shields.io/github/license/ls9512/UEvent)
+[![openupm](https://img.shields.io/npm/v/com.ls9512.uevent?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ls9512.uevent/)
 ![topLanguage](https://img.shields.io/github/languages/top/ls9512/UEvent)
 ![size](https://img.shields.io/github/languages/code-size/ls9512/UEvent)
 ![issue](https://img.shields.io/github/issues/ls9512/UEvent)
-![license](https://img.shields.io/github/license/ls9512/UEvent)
 ![last](https://img.shields.io/github/last-commit/ls9512/UEvent)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
