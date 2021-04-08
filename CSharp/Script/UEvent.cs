@@ -101,7 +101,7 @@ namespace Aya.Events
 
         public static void Remove<T>(T eventType, Action<object[]> action)
         {
-            EventManager.GetDispatcher<T>().RemoveListener<T>(action);
+            EventManager.GetDispatcher<T>().RemoveListener<T>(eventType, action);
         }
 
         #endregion
