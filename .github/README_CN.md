@@ -351,7 +351,7 @@ public class ClassEventDefine
 }
 
 // 监听
-UEvent<ClassEventDefine>.Listen(Receive);
+UEvent.Listen<ClassEventDefine>(Receive);
 
 // 发送
 UEvent.Dispatch(new ClassEventDefine()
@@ -360,7 +360,7 @@ UEvent.Dispatch(new ClassEventDefine()
 });
 
 // 移除
-UEvent<ClassEventDefine>.Remove(Receive);
+UEvent.Remove<ClassEventDefine>(Receive);
 
 // 接收
 public void Receive(ClassEventDefine evt)
