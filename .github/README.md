@@ -350,7 +350,7 @@ public class ClassEventDefine
 }
 
 // Register listener
-UEvent<ClassEventDefine>.Listen(Receive);
+UEvent.Listen<ClassEventDefine>(Receive);
 
 // Dispatch event
 UEvent.Dispatch(new ClassEventDefine()
@@ -359,7 +359,7 @@ UEvent.Dispatch(new ClassEventDefine()
 });
 
 // Remove listener
-UEvent<ClassEventDefine>.Remove(Receive);
+UEvent.Remove<ClassEventDefine>(Receive);
 
 // Receive method
 public void Receive(ClassEventDefine evt)
