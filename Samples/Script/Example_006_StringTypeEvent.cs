@@ -1,7 +1,7 @@
 ﻿using System;
 using Aya.Events;
 
-namespace Aya.Example
+namespace Aya.Sample
 {
     public static class StringEventDefine
     {

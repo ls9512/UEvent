@@ -1,6 +1,6 @@
 ﻿using Aya.Events;
 
-namespace Aya.Example
+namespace Aya.Sample
 {
     public class UserCSharpClass001 : ObjectListener
     {

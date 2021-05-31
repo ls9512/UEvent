@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Aya.Events;
 
-namespace Aya.Example
+namespace Aya.Sample
 {
     public class UserCSharpClass002
     {
