@@ -19,7 +19,7 @@ namespace Aya.Events
         /// <summary>
         /// 监听对象类型 - 监听方法 - 包含监听事件类型列表
         /// </summary>
-        protected static Dictionary<Type, Dictionary<MethodInfo, List<object>>> MethodMap = new Dictionary<Type, Dictionary<MethodInfo, List<object>>>();
+        protected static Dictionary<Type, Dictionary<MethodInfo, List<Attribute>>> MethodMap = new Dictionary<Type, Dictionary<MethodInfo, List<Attribute>>>();
 
         /// <summary>
         /// 事件监听对象
@@ -57,11 +57,11 @@ namespace Aya.Events
                 foreach (var kv in tempObjEventDic)
                 {
                     var method = kv.Key;
-                    var eventTypeList = kv.Value;
-                    for (var i = 0; i < eventTypeList.Count; i++)
+                    var eventAttributeList = kv.Value;
+                    for (var i = 0; i < eventAttributeList.Count; i++)
                     {
-                        var eventType = eventTypeList[i];
-                        _addListener(eventType, method);
+                        var eventAttribute = eventAttributeList[i];
+                        _addListenerWithAttribute(eventAttribute, method);
                     }
                 }
 
@@ -69,59 +69,26 @@ namespace Aya.Events
             }
 
             // 如果是未注册过的对象类型，则遍历所有被标记需要监听的方法，进行注册
-            var objEventDic = new Dictionary<MethodInfo, List<object>>();
+            var objEventDic = new Dictionary<MethodInfo, List<Attribute>>();
             MethodMap.Add(objType, objEventDic);
-            var methods = objType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-            for (var i = 0; i < methods.Length; i++)
+            var methodInfos = objType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            for (var i = 0; i < methodInfos.Length; i++)
             {
-                var method = methods[i];
-                var attrs = method.GetCustomAttributes(typeof(Attribute), false);
-                if (attrs.Length <= 0) continue;
+                var methodInfo = methodInfos[i];
+                var attributes = methodInfo.GetCustomAttributes(typeof(Attribute), false);
+                if (attributes.Length <= 0) continue;
 
-                var eventList = new List<object>();
-                objEventDic.Add(method, eventList);
+                var eventAttributeList = new List<Attribute>();
+                objEventDic.Add(methodInfo, eventAttributeList);
 
-                for (var j = 0; j < attrs.Length; j++)
+                for (var j = 0; j < attributes.Length; j++)
                 {
-                    var attrTemp = attrs[j];
-                    if (attrTemp == null) return;
-                    // Listen Attribute
-                    if (attrTemp is ListenAttribute attrListen)
-                    {
-                        var priority = attrListen.Priority;
-                        var interrupt = attrListen.Interrupt;
-                        foreach (var eventType in attrListen.Types)
-                        {
-                            eventList.Add(eventType);
-                            _addListener(eventType, method, null, priority, interrupt);
-                        }
-                    }
-
-                    // Listen Type Attribute
-                    if (attrTemp is ListenTypeAttribute attrListenType)
-                    {
-                        var eventEnumType = attrListenType.Type;
-                        var priority = attrListenType.Priority;
-                        var interrupt = attrListenType.Interrupt;
-                        var eventEnumArray = Enum.GetValues(eventEnumType);
-                        foreach (var eventType in eventEnumArray)
-                        {
-                            eventList.Add(eventType);
-                            _addListener(eventType, method, null, priority, interrupt);
-                        }
-                    }
-
-                    // Listen Group Attribute
-                    if (attrTemp is ListenGroupAttribute attrListenGroup)
-                    {
-                        var eventType = attrListenGroup.Type;
-                        var group = attrListenGroup.Group;
-                        var priority = attrListenGroup.Priority;
-                        var interrupt = attrListenGroup.Interrupt;
-                        eventList.Add(eventType);
-                        _addListener(eventType, method, group, priority, interrupt);
-                    }
+                    var attribute = attributes[j];
+                    if (attribute == null) return;
+                    var attributeTemp = attribute as Attribute;
+                    if (attributeTemp == null) return;
+                    _addListenerWithAttribute(attributeTemp, methodInfo);
+                    eventAttributeList.Add(attributeTemp);
                 }
             }
         }
@@ -153,14 +120,56 @@ namespace Aya.Events
         #region Private
 
         /// <summary>
+        /// 根据特性标签添加事件监听
+        /// </summary>
+        /// <param name="attribute">特性</param>
+        /// <param name="methodInfo">监听方法</param>
+        private void _addListenerWithAttribute(Attribute attribute, MethodInfo methodInfo)
+        {
+            // Listen Attribute
+            if (attribute is ListenAttribute attrListen)
+            {
+                var priority = attrListen.Priority;
+                var interrupt = attrListen.Interrupt;
+                foreach (var eventType in attrListen.Types)
+                {
+                    _addListener(eventType, methodInfo, null, priority, interrupt);
+                }
+            }
+
+            // Listen Type Attribute
+            if (attribute is ListenTypeAttribute attrListenType)
+            {
+                var eventEnumType = attrListenType.Type;
+                var priority = attrListenType.Priority;
+                var interrupt = attrListenType.Interrupt;
+                var eventEnumArray = Enum.GetValues(eventEnumType);
+                foreach (var eventType in eventEnumArray)
+                {
+                    _addListener(eventType, methodInfo, null, priority, interrupt);
+                }
+            }
+
+            // Listen Group Attribute
+            if (attribute is ListenGroupAttribute attrListenGroup)
+            {
+                var eventType = attrListenGroup.Type;
+                var group = attrListenGroup.Group;
+                var priority = attrListenGroup.Priority;
+                var interrupt = attrListenGroup.Interrupt;
+                _addListener(eventType, methodInfo, group, priority, interrupt);
+            }
+        }
+
+        /// <summary>
         /// 将监听器中的方法注册到事件分发器
         /// </summary>
         /// <param name="eventType">事件类型</param>
-        /// <param name="method">监听 方法</param>
+        /// <param name="methodInfo">监听 方法</param>
         /// <param name="group">监听分组</param>
         /// <param name="priority">优先级</param>
         /// <param name="interrupt">是否中断事件队列</param>
-        private void _addListener(object eventType, MethodInfo method, object group = null, int priority = 0, bool interrupt = false)
+        private void _addListener(object eventType, MethodInfo methodInfo, object group = null, int priority = 0, bool interrupt = false)
         {
             EventDispatcher dispatcher;
             if (eventType is Type type)
@@ -172,7 +181,7 @@ namespace Aya.Events
                 dispatcher = EventManager.GetDispatcher(eventType.GetType());
             }
 
-            dispatcher.AddListener(eventType, Listener, method, group, priority, interrupt);
+            dispatcher.AddListener(eventType, Listener, methodInfo, group, priority, interrupt);
             if (!RegisteredDispatchers.Contains(dispatcher))
             {
                 RegisteredDispatchers.Add(dispatcher);
