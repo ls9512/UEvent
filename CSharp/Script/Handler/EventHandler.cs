@@ -90,7 +90,7 @@ namespace Aya.Events
             var method = eventHandler.Method;
             var parameters = eventHandler.Parameters;
             var target = eventHandler.Target;
-            if (method == null || target == null) return false;
+            if (method == null) return false;
 
             try
             {
