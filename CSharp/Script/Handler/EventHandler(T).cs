@@ -13,11 +13,11 @@ namespace Aya.Events
     [Serializable]
     public partial class EventHandler<T> : EventHandler
     {
-        public Action<T> ActionT { get; set; }
+        public Action<T> ActionT;
 
-        public Action<T, object[]> ActionTArgs { get; set; }
+        public Action<T, object[]> ActionTArgs;
 
-        public Action<object[]> ActionArgs { get; set; }
+        public Action<object[]> ActionArgs;
 
         /// <summary>
         /// 执行事件

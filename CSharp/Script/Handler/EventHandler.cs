@@ -14,52 +14,52 @@ namespace Aya.Events
     [Serializable]
     public partial class EventHandler
     {
-        #region Property
-        
+        #region Field
+
         /// <summary>
         /// 事件类型
         /// </summary>
-        public Type Type { get; set; }
+        public Type Type;
 
         /// <summary>
         /// 事件类型值
         /// </summary>
-        public object EventType { get; set; }
+        public object EventType;
 
         /// <summary>
         /// 事件目标对象
         /// </summary>
-        public object Target { get; set; }
+        public object Target;
 
         /// <summary>
         /// 监听分组
         /// </summary>
-        public object Group { get; set; }
+        public object Group;
 
         /// <summary>
         /// 优先级
         /// </summary>
-        public int Priority { get; set; }
+        public int Priority;
 
         /// <summary>
         /// 是否中断事件队列
         /// </summary>
-        public bool Interrupt { get; set; }
+        public bool Interrupt;
 
         /// <summary>
         /// 监听委托
         /// </summary>
-        public Action Action { get; set; }
+        public Action Action;
 
         /// <summary>
         /// 监听方法
         /// </summary>
-        public MethodInfo Method { get; set; }
+        public MethodInfo Method;
 
         /// <summary>
         /// 监听方法的参数
         /// </summary>
-        public ParameterInfo[] Parameters { get; set; }
+        public ParameterInfo[] Parameters;
 
         #endregion
 
