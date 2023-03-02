@@ -21,7 +21,7 @@ namespace Aya.Events
       
         public static EventMonitor Instance;
 
-        [MenuItem("Aya Game Studio/Plugins/Event Monitor", false, 0)]
+        [MenuItem("Tools/Aya Game/UEvent/Event Monitor", false, 0)]
         public static void ShowWindow()
         {
             if (Instance == null)
