@@ -288,7 +288,7 @@ namespace Aya.Events
             for (var i = 0; i < eventHandlers.Count; i++)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Target == target)
+                if (target.Equals(eventHandler.Target))
                 {
                     result.Add(eventHandler);
                 }
@@ -327,7 +327,7 @@ namespace Aya.Events
             for (var i = 0; i < eventHandlers.Count; i++)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Target == target)
+                if (target.Equals(eventHandler.Target))
                 {
                     result.Add(eventHandler);
                 }
@@ -353,7 +353,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Action.Equals(action))
+                if (action.Equals(eventHandler.Action))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -373,7 +373,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionT.Equals(action))
+                if (action.Equals(eventHandler.ActionT))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -393,7 +393,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionTArgs.Equals(action))
+                if (action.Equals(eventHandler.ActionTArgs))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -413,7 +413,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionArgs.Equals(action))
+                if (action.Equals(eventHandler.ActionArgs))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -433,7 +433,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Target == null || (eventHandler.Target.Equals(target) && eventHandler.Method.Equals(method)))
+                if (target.Equals(eventHandler.Target) && method.Equals(eventHandler.Method))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -457,7 +457,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Action.Equals(action))
+                if (action.Equals(eventHandler.Action))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -477,7 +477,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionT.Equals(action))
+                if (action.Equals(eventHandler.ActionT))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -497,7 +497,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionTArgs.Equals(action))
+                if (action.Equals(eventHandler.ActionTArgs))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -517,7 +517,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 if (!(eventHandlers[i] is EventHandler<T> eventHandler)) continue;
-                if (eventHandler.ActionArgs.Equals(action))
+                if (action.Equals(eventHandler.ActionArgs))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -537,7 +537,7 @@ namespace Aya.Events
             for (var i = eventHandlers.Count - 1; i >= 0; i--)
             {
                 var eventHandler = eventHandlers[i];
-                if (eventHandler.Target == null || (eventHandler.Target.Equals(target) && eventHandler.Method.Equals(method)))
+                if (target.Equals(eventHandler.Target) && method.Equals(eventHandler.Method))
                 {
                     eventHandlerGroup.Remove(eventHandler);
                 }
@@ -616,7 +616,7 @@ namespace Aya.Events
             {
                 var eventHandler = eventHandlers[i];
                 var condition1 = eventHandler.Target == null && target == null;
-                var condition2 = eventHandler.Target != null && eventHandler.Target.Equals(target);
+                var condition2 = target != null && target.Equals(eventHandler.Target);
                 var check = condition1 || condition2;
                 if (!check) continue;
                 eventHandler.Invoke(eventType, args);
@@ -663,7 +663,7 @@ namespace Aya.Events
             {
                 var eventHandler = eventHandlers[i];
                 var condition1 = eventHandler.Group == null && group == null;
-                var condition2 = eventHandler.Group != null && eventHandler.Group.Equals(group);
+                var condition2 = group != null && group.Equals(eventHandler.Group);
                 var check = condition1 || condition2;
                 if (!check) continue;
                 eventHandler.Invoke(eventType, args);
