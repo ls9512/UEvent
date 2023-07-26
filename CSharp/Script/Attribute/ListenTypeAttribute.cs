@@ -11,7 +11,7 @@ using System;
 namespace Aya.Events
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class ListenTypeAttribute : Attribute
+    public class ListenTypeAttribute : EventAttributeBase
     {
         /// <summary>
         /// 监听事件枚举类型
@@ -21,12 +21,12 @@ namespace Aya.Events
         /// <summary>
         /// 优先级
         /// </summary>
-        public int Priority { get; }
+        public int Priority;
 
         /// <summary>
         /// 是否中断事件队列
         /// </summary>
-        public bool Interrupt { get; }
+        public bool Interrupt;
 
         /// <summary>
         /// 监听所有事件

@@ -14,62 +14,63 @@
 
 > Official QQ Group：[1070645638](https://jq.qq.com/?_wv=1027&k=ezkLnUln)
 
-<!-- vscode-markdown-toc -->
-* 1. [Introduction](#Introduction)
-	* 1.1. [Environment](#Environment)
-	* 1.2. [Folder](#Folder)
-	* 1.3. [Feature](#Feature)
-	* 1.4. [Structure](#Structure)
-	* 1.5. [Rules / Recommendations](#RulesRecommendations)
-	* 1.6. [Start](#Start)
-* 2. [Component](#Component)
-	* 2.1. [Event Manager](#EventManager)
-	* 2.2. [Event Dispatcher](#EventDispatcher)
-	* 2.3. [Event Listener](#EventListener)
-	* 2.4. [Object  Listener](#ObjectListener)
-	* 2.5. [Unity MonoListener](#UnityMonoListener)
-	* 2.6. [Event Handler](#EventHandler)
-		* 2.6.1. [EventHandler](#EventHandler-1)
-		* 2.6.2. [EventHandler\<T\>](#EventHandlerT)
-* 3. [Optional Attribute](#OptionalAttribute)
-	* 3.1. [ EventEnumAttribute](#EventEnumAttribute)
-	* 3.2. [ListenAttribute](#ListenAttribute)
-	* 3.3. [ListenTypeAttribute](#ListenTypeAttribute)
-	* 3.4. [ListenGroupAttribute](#ListenGroupAttribute)
-* 4. [API](#API)
-	* 4.1. [Event Definition](#EventDefinition)
-	* 4.2. [Auto Listener](#AutoListener)
-	* 4.3. [Manual Listener](#ManualListener)
-	* 4.4. [Listen Event](#ListenEvent)
-	* 4.5. [Listen Event Type](#ListenEventType)
-	* 4.6. [Listen Group](#ListenGroup)
-	* 4.7. [Maunal Register / Deregister Event](#MaunalRegisterDeregisterEvent)
-	* 4.8. [Dispatch Event](#DispatchEvent)
-	* 4.9. [Dispatch Event (Thread Safety for Unity)](#DispatchEventThreadSafetyforUnity)
-	* 4.10. [Dispatch to Target](#DispatchtoTarget)
-	* 4.11. [Dispatch to Group](#DispatchtoGroup)
-	* 4.12. [Full API](#FullAPI)
-* 5. [Compatibility Features](#CompatibilityFeatures)
-	* 5.1. [Compatibility List](#CompatibilityList)
-	* 5.2. [string Event](#stringEvent)
-	* 5.3. [class / struct Event](#classstructEvent)
+<!-- TOC -->
 
-<!-- vscode-markdown-toc-config
-	numbering=true
-	autoSave=true
-	/vscode-markdown-toc-config -->
-<!-- /vscode-markdown-toc -->
-##  1. <a name='Introduction'></a>Introduction
-###  1.1. <a name='Environment'></a>Environment
+- [UEvent](#uevent)
+	- [1 Introduction](#1-introduction)
+		- [1.1 Environment](#11-environment)
+		- [1.2 Folder](#12-folder)
+		- [1.3 Feature](#13-feature)
+		- [1.4 Structure](#14-structure)
+		- [1.5 Rules / Recommendations](#15-rules--recommendations)
+		- [1.6 Start](#16-start)
+	- [2 Component](#2-component)
+		- [2.1 Event Manager](#21-event-manager)
+		- [2.2 Event Dispatcher](#22-event-dispatcher)
+		- [2.3 Event Listener](#23-event-listener)
+		- [2.4 Object  Listener](#24-object--listener)
+		- [2.5 Unity MonoListener](#25-unity-monolistener)
+		- [2.6 Event Handler](#26-event-handler)
+			- [2.6.1 EventHandler](#261-eventhandler)
+			- [2.6.2 EventHandler\<T\>](#262-eventhandlert)
+	- [3 Optional Attribute](#3-optional-attribute)
+		- [3.1 EventEnumAttribute](#31-eventenumattribute)
+		- [3.2 ListenAttribute](#32-listenattribute)
+		- [3.3 ListenTypeAttribute](#33-listentypeattribute)
+		- [3.4 ListenGroupAttribute](#34-listengroupattribute)
+	- [4 API](#4-api)
+		- [4.1 Event Definition](#41-event-definition)
+		- [4.2 Auto Listener](#42-auto-listener)
+		- [4.3 Manual Listener](#43-manual-listener)
+		- [4.4 Listen Event](#44-listen-event)
+		- [4.5 Listen Event Type](#45-listen-event-type)
+		- [4.6 Listen Group](#46-listen-group)
+		- [4.7 Maunal Register / Deregister Event](#47-maunal-register--deregister-event)
+		- [4.8 Dispatch Event](#48-dispatch-event)
+		- [4.9 Dispatch Event (Thread Safety for Unity)](#49-dispatch-event-thread-safety-for-unity)
+		- [4.10 Dispatch to Target](#410-dispatch-to-target)
+		- [4.11 Dispatch to Group](#411-dispatch-to-group)
+		- [4.12 Full API](#412-full-api)
+	- [5 Compatibility Features](#5-compatibility-features)
+		- [5.1 Performance Optimization](#51-performance-optimization)
+			- [5.1.1 Preloading](#511-preloading)
+		- [5.2 Compatibility List](#52-compatibility-list)
+		- [5.3 \>string Event](#53-string-event)
+		- [5.4 class / struct Event](#54-class--struct-event)
+
+<!-- /TOC -->
+
+## 1 Introduction
+### 1.1 Environment
 ![Unity: 2019.4.3f1](https://img.shields.io/badge/Unity-2017+-blue) 
 ![.NET 4.x](https://img.shields.io/badge/.NET-4.x-blue) 
 
-###  1.2. <a name='Folder'></a>Folder
+### 1.2 Folder
 * **Samples**: Example folder. It can be deleted in the you project to reduce space consumption.
 * **CSharp**: The core fully implemented by .Net, can be used independently in .Net environment.
 * **Unity**:  The additional functions implemented by unity class library, you need to work with the code in the core folder when working in unity environment.
 
-###  1.3. <a name='Feature'></a>Feature
+### 1.3 Feature
 * Support to define multiple groups of events through enumeration, and monitor by single event or by event type.
 * At the same time, it supports enum / string / class / struct type event definition to minimize changes and be compatible with different projects.
 * Support receiving event priority.
@@ -78,12 +79,12 @@
 * It also supports common methods and delegated methods.
 * Provide the `ObjectListener` and `MonoListener` base classes, so that any class can automatically register/remove listeners, and you can also implement the `IEventListener` interface yourself.
 
-###  1.4. <a name='Structure'></a>Structure
+### 1.4 Structure
 * **EventManager** -> **EventDispatcher**-> **EventHandler**
 * Internal implementation : **EventListener** -> **EventDispatcher**
 * External implementation : **UserEventListener**
 
-###  1.5. <a name='RulesRecommendations'></a>Rules / Recommendations
+### 1.5 Rules / Recommendations
 * For each type of event, use an enumerated type such as AppEvent, GameEvent, etc. Each event type corresponds to an event dispatcher instance.
 * It is possible to use only one event type per project, but it is not recommended.
 * Method-type listener needs to specify the binding object, while delegate-type listener does not need to specify the object.
@@ -93,30 +94,30 @@
 * **enum** / **string** type events use the **UEvent** interface, **class** / **struct** type events use the **UEvent\<T\>** interface, the interface does not do Complete type constraints, but be sure to call in accordance with the convention to avoid unexpected problems.
 * Although multiple types of events are supported at the same time, it is still strongly recommended to use only one type of event format in a project.
 
-###  1.6. <a name='Start'></a>Start
+### 1.6 Start
 Copy `Events` folder into `UnityProject/Assets/Plugins/`.
 
 ***
 
-##  2. <a name='Component'></a>Component
+## 2 Component
 
-###  2.1. <a name='EventManager'></a>Event Manager
+### 2.1 Event Manager
 Used to manage all event dispatchers.
 
-###  2.2. <a name='EventDispatcher'></a>Event Dispatcher
+### 2.2 Event Dispatcher
 Used to manage listener registration/de-registeration and event dispatcher for a specific event type.
 
-###  2.3. <a name='EventListener'></a>Event Listener
+### 2.3 Event Listener
 Used to manage the event listener registration/de-registration of a specified object.
 
-###  2.4. <a name='ObjectListener'></a>Object  Listener
+### 2.4 Object  Listener
 The user class implements the event mechanism by inheriting the class or initializing the class by itself, which can automatically register and de-register the object, and provide quick-call listener registration, removal, and event distribution interfaces.
 
-###  2.5. <a name='UnityMonoListener'></a>Unity MonoListener
+### 2.5 Unity MonoListener
 Same as ObjectListener's interface，uesd for MonoBehaviour GameObject.
 
-###  2.6. <a name='EventHandler'></a>Event Handler
-####  2.6.1. <a name='EventHandler-1'></a>EventHandler
+### 2.6 Event Handler
+#### 2.6.1 EventHandler
 |Property|Description|Remarks|
 |-|-|-|
 |Type|Event definition object type|Event definition `enum/string/class/struct` and other objects Type, equivalent to `typeof(X)`|
@@ -128,7 +129,7 @@ Same as ObjectListener's interface，uesd for MonoBehaviour GameObject.
 |Method|Listen method|For the non-parameter delegated listening, the delegate will be automatically converted to MehtodInfo for execution|
 |Parameters|Parameters of the listen method||
 |Action|Listen delegate Action||
-####  2.6.2. <a name='EventHandlerT'></a>EventHandler\<T\>
+#### 2.6.2 EventHandler\<T\>
 |Property|Description|Remarks|
 |-|-|-|
 |ActionT|Listen delegate Action\<T\>||
@@ -137,11 +138,11 @@ Same as ObjectListener's interface，uesd for MonoBehaviour GameObject.
 
 ***
 
-##  3. <a name='OptionalAttribute'></a>Optional Attribute
+## 3 Optional Attribute
 
-###  3.1. <a name='EventEnumAttribute'></a> EventEnumAttribute
+### 3.1 EventEnumAttribute
 This attribute is a reserved function, and it may be used to automatically acquire event definitions scattered in different assemblies by reflection in the later stage. Currently, it has no function.
-###  3.2. <a name='ListenAttribute'></a>ListenAttribute
+### 3.2 ListenAttribute
 It is used to mark the method that needs to listen the specified event in class.
 The event listener will automatically search for all methods containing this attribute and register for listen.
 * **Property**
@@ -154,14 +155,14 @@ The event listener will automatically search for all methods containing this att
    * Must be an instance object.
    * Must be a non-static method.
 
-###  3.3. <a name='ListenTypeAttribute'></a>ListenTypeAttribute
+### 3.3 ListenTypeAttribute
 The method with this attribute can receive all events of the specified event type, traverse all enumerations and register all listeners.
 * **Property**
    * **Type** : Event enum type
    * **Priority** : Priority
    * **Interrupt** : Interrupt event queue
 
-###  3.4. <a name='ListenGroupAttribute'></a>ListenGroupAttribute
+### 3.4 ListenGroupAttribute
 The event will only be triggered when the event sent through the `DispatchGroup` interface corresponds to the group in the attribute tag.
 * **Property**
    * **Type** : Event type
@@ -174,9 +175,9 @@ The event will only be triggered when the event sent through the `DispatchGroup`
 
 ***
 
-##  4. <a name='API'></a>API
+## 4 API
 
-###  4.1. <a name='EventDefinition'></a>Event Definition
+### 4.1 Event Definition
 ``` cs
 /* 
 UEvent recommends using enumeration types to define events, and implement event grouping functions through different enumerations.
@@ -192,7 +193,7 @@ public enum GameEventType
 }
 ```
 
-###  4.2. <a name='AutoListener'></a>Auto Listener
+### 4.2 Auto Listener
 ``` cs
 // Any C# class gains monitoring capabilities.
 public class TestClass : EventListener
@@ -205,7 +206,7 @@ public class UnityTestClass : MonoEventListener
 }
 ```
 
-###  4.3. <a name='ManualListener'></a>Manual Listener
+### 4.3 Manual Listener
 ``` cs
 // Generate a listener for the specified object, executed when the general object is generated.
 var listener = new EventListener(this);
@@ -217,7 +218,7 @@ EventListener.Register();
 EventListener.DeRegister();
 ```
 
-###  4.4. <a name='ListenEvent'></a>Listen Event
+### 4.4 Listen Event
 ``` cs
 // Listen to a single event, no priority.
 [Listen(GameEvent.GameStart)]
@@ -238,7 +239,7 @@ public void TestMethod()
 }
 ```
 
-###  4.5. <a name='ListenEventType'></a>Listen Event Type
+### 4.5 Listen Event Type
 ``` cs
 [ListenType(typeof(GameEvent))]
 public void TestMethod()
@@ -246,7 +247,7 @@ public void TestMethod()
 }
 ```
 
-###  4.6. <a name='ListenGroup'></a>Listen Group
+### 4.6 Listen Group
 ``` cs
 [ListenGroup(GameEvent.GameStart, "Player")]
 public void TestMethod()
@@ -254,7 +255,7 @@ public void TestMethod()
 }
 ```
 
-###  4.7. <a name='MaunalRegisterDeregisterEvent'></a>Maunal Register / Deregister Event
+### 4.7 Maunal Register / Deregister Event
 ``` cs
 // Add listener
 UEvent.Listen<T>(eventType, this, methodInfo, group, priorty, interrupt);
@@ -272,29 +273,29 @@ UEvent.Remove(eventType, this, method);
 UEvent.Remove(eventType, action);
 ```
 
-###  4.8. <a name='DispatchEvent'></a>Dispatch Event
+### 4.8 Dispatch Event
 ``` cs
 UEvent.Dispatch(eventType, args);
 ```
 
-###  4.9. <a name='DispatchEventThreadSafetyforUnity'></a>Dispatch Event (Thread Safety for Unity)
+### 4.9 Dispatch Event (Thread Safety for Unity)
 ``` cs
 // This interface will delegate events to the Unity main thread for execution, only available in Unity extensions.
 UEvent.DispatchSafe(eventType, args);
 ```
 
-###  4.10. <a name='DispatchtoTarget'></a>Dispatch to Target
+### 4.10 Dispatch to Target
 ``` cs
 UEvent.DispatchTo(eventType, target, args);
 ```
 
-###  4.11. <a name='DispatchtoGroup'></a>Dispatch to Group
+### 4.11 Dispatch to Group
 ``` cs
 // If the `Group` parameter is empty, it is equivalent to calling the `Dispatch` interface, and the event will be sent to any listener method without a group.
 UEvent.DispatchGroup(eventType, group, args);
 ```
 
-###  4.12. <a name='FullAPI'></a>Full API
+### 4.12 Full API
 If you want to get the complete function of **UEvent** or call the internal interface, you can call it by using the following methods. The interface is slightly different from the quick call interface mentioned above. You can get **EventDispatcher** first through **EventManager**, then call the specific internal interface, for example:
 ``` cs
 EventManager.GetDispatcher<T>().AddListener<T>(eventType, action, group, priorty, interrupt);
@@ -304,8 +305,20 @@ EventManager.GetDispatcher<T>().RemoveListener<T>(eventType, action);
 
 ***
 
-##  5. <a name='CompatibilityFeatures'></a>Compatibility Features
-###  5.1. <a name='CompatibilityList'></a>Compatibility List
+## 5 Compatibility Features
+
+### 5.1 Performance Optimization
+#### 5.1.1 Preloading
+When a type is activated for the first time and registers for listening events, it is necessary to obtain all the methods of the type that need to be monitored and the attributes of the monitoring through reflection. The performance overhead due to reflection cannot be avoided, but it can be preloaded and cached. To reduce the overhead of instant use, so when necessary, you can actively call the following method at an appropriate time such as program startup or loading, and pre-register and cache the specified type of monitoring event information.
+``` cs
+public void PreRegister()
+{
+	var type = typeof(SomeClass);
+	EventListener.Register(type);
+}
+```
+
+### 5.2 Compatibility List
 In order to be compatible with the existing event type definition methods in various projects, partial support for string / class / struct type events is provided, which can realize basic functions such as automatic/manual binding and event sending, but some functions will also be lost , See the function support list for details:
 
 |Function|Support|
@@ -318,7 +331,7 @@ In order to be compatible with the existing event type definition methods in var
 |Listen group **ListenGroupAttribute**|√|
 |Listen event group type **ListenTypeAttribute**|×|
 
-###  5.2. <a name='stringEvent'></a>string Event
+### 5.3 >string Event
 ``` cs
 // Define event type
 public static class StringEventDefine
@@ -343,7 +356,7 @@ public void Receive(string message)
 }
 ```
 
-###  5.3. <a name='classstructEvent'></a>class / struct Event
+### 5.4 class / struct Event
 ``` cs
 // Define event type
 public class ClassEventDefine

@@ -19,7 +19,7 @@ namespace Aya.Events
         /// <summary>
         /// 监听对象类型 - 监听方法 - 包含监听事件类型列表
         /// </summary>
-        protected static Dictionary<Type, Dictionary<MethodInfo, List<Attribute>>> MethodMap = new Dictionary<Type, Dictionary<MethodInfo, List<Attribute>>>();
+        protected static Dictionary<Type, Dictionary<MethodInfo, List<EventAttributeBase>>> MethodMap = new Dictionary<Type, Dictionary<MethodInfo, List<EventAttributeBase>>>();
 
         /// <summary>
         /// 事件监听对象
@@ -44,6 +44,33 @@ namespace Aya.Events
 
         #region Register / DeRegister
 
+        public static void Register(Type objType)
+        {
+            // 如果是未注册过的对象类型，则遍历所有被标记需要监听的方法，进行注册
+            if (MethodMap.TryGetValue(objType, out var _)) return;
+            var objEventDic = new Dictionary<MethodInfo, List<EventAttributeBase>>();
+            MethodMap.Add(objType, objEventDic);
+            var methodInfos = objType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            for (var i = 0; i < methodInfos.Length; i++)
+            {
+                var methodInfo = methodInfos[i];
+                var attributes = methodInfo.GetCustomAttributes(typeof(EventAttributeBase), false);
+                if (attributes.Length <= 0) continue;
+
+                var eventAttributeList = new List<EventAttributeBase>();
+                objEventDic.Add(methodInfo, eventAttributeList);
+
+                for (var j = 0; j < attributes.Length; j++)
+                {
+                    var attribute = attributes[j];
+                    if (attribute == null) return;
+                    var attributeTemp = attribute as EventAttributeBase;
+                    if (attributeTemp == null) return;
+                    eventAttributeList.Add(attributeTemp);
+                }
+            }
+        }
+
         /// <summary>
         /// 注册监听器
         /// </summary>
@@ -51,44 +78,20 @@ namespace Aya.Events
         {
             var objType = Listener.GetType();
             // 如果该类型对象已经被注册过，则直接遍历该类型所有需要监听的方法并注册到事件分发器
-            if (MethodMap.ContainsKey(objType))
+            if (!MethodMap.TryGetValue(objType, out var tempObjEventDic))
             {
-                var tempObjEventDic = MethodMap[objType];
-                foreach (var kv in tempObjEventDic)
-                {
-                    var method = kv.Key;
-                    var eventAttributeList = kv.Value;
-                    for (var i = 0; i < eventAttributeList.Count; i++)
-                    {
-                        var eventAttribute = eventAttributeList[i];
-                        _addListenerWithAttribute(eventAttribute, method);
-                    }
-                }
-
-                return;
+                Register(objType);
+                tempObjEventDic = MethodMap[objType];
             }
 
-            // 如果是未注册过的对象类型，则遍历所有被标记需要监听的方法，进行注册
-            var objEventDic = new Dictionary<MethodInfo, List<Attribute>>();
-            MethodMap.Add(objType, objEventDic);
-            var methodInfos = objType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            for (var i = 0; i < methodInfos.Length; i++)
+            foreach (var kv in tempObjEventDic)
             {
-                var methodInfo = methodInfos[i];
-                var attributes = methodInfo.GetCustomAttributes(typeof(Attribute), false);
-                if (attributes.Length <= 0) continue;
-
-                var eventAttributeList = new List<Attribute>();
-                objEventDic.Add(methodInfo, eventAttributeList);
-
-                for (var j = 0; j < attributes.Length; j++)
+                var method = kv.Key;
+                var eventAttributeList = kv.Value;
+                for (var i = 0; i < eventAttributeList.Count; i++)
                 {
-                    var attribute = attributes[j];
-                    if (attribute == null) return;
-                    var attributeTemp = attribute as Attribute;
-                    if (attributeTemp == null) return;
-                    _addListenerWithAttribute(attributeTemp, methodInfo);
-                    eventAttributeList.Add(attributeTemp);
+                    var eventAttribute = eventAttributeList[i];
+                    _addListenerWithAttribute(eventAttribute, method);
                 }
             }
         }
@@ -124,7 +127,7 @@ namespace Aya.Events
         /// </summary>
         /// <param name="attribute">特性</param>
         /// <param name="methodInfo">监听方法</param>
-        private void _addListenerWithAttribute(Attribute attribute, MethodInfo methodInfo)
+        private void _addListenerWithAttribute(EventAttributeBase attribute, MethodInfo methodInfo)
         {
             // Listen Attribute
             if (attribute is ListenAttribute attrListen)
@@ -182,10 +185,7 @@ namespace Aya.Events
             }
 
             dispatcher.AddListener(eventType, Listener, methodInfo, group, priority, interrupt);
-            if (!RegisteredDispatchers.Contains(dispatcher))
-            {
-                RegisteredDispatchers.Add(dispatcher);
-            }
+            RegisteredDispatchers.Add(dispatcher);
         }
 
         #endregion

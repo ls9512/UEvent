@@ -11,22 +11,22 @@ using System;
 namespace Aya.Events
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class ListenAttribute : Attribute
+    public class ListenAttribute : EventAttributeBase
     {
         /// <summary>
         /// 事件类型
         /// </summary>
-        public object[] Types { get; }
+        public object[] Types;
 
         /// <summary>
         /// 优先级
         /// </summary>
-        public int Priority { get; }
+        public int Priority;
 
         /// <summary>
         /// 是否中断事件队列
         /// </summary>
-        public bool Interrupt { get; }
+        public bool Interrupt;
 
         /// <summary>
         /// 监听事件
