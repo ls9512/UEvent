@@ -2,7 +2,7 @@
   "name": "com.ls9512.uevent",
   "displayName": "UEvent",
   "description": "UEvent is a general message event component that can be used in Unity and .Net environment.",
-  "version": "20230726",
+  "version": "2023.07.26",
   "unity": "2017.1",
   "license": "MIT",
   "repository": {
