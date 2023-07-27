@@ -28,7 +28,7 @@ namespace Aya.Events
                 if (string.IsNullOrEmpty(_log))
                 {
                     var stringBuilder = new StringBuilder();
-                    stringBuilder.Append(DateTime.ToString(EventEditorSetting.Ins.DateFormat));
+                    stringBuilder.Append(DateTime.ToString(UEventEditorSetting.Ins.DateFormat));
                     stringBuilder.Append("\t");
                     stringBuilder.Append(EventType);
                     stringBuilder.Append("\t");

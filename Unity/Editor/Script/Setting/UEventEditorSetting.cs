@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-//  Script   : EventEditorSetting.cs
+//  Script   : UEventEditorSetting.cs
 //  Info     : 事件编辑器配置类
 //  Author   : ls9512 2021
 //  E-mail   : ls9512@vip.qq.com
@@ -12,25 +12,25 @@ using UnityEngine;
 
 namespace Aya.Events
 {
-    [CreateAssetMenu(menuName = "UEvent/Event Editor Setting", fileName = "EventEditorSetting")]
-    public class EventEditorSetting : ScriptableObject
+    [CreateAssetMenu(menuName = "UEvent/Event Editor Setting", fileName = "UEventEditorSetting")]
+    public class UEventEditorSetting : ScriptableObject
     {
         #region Instance
 
-        public static EventEditorSetting Ins
+        public static UEventEditorSetting Ins
         {
             get
             {
                 if (Instance == null)
                 {
-                    Instance = FindAsset<EventEditorSetting>();
+                    Instance = FindAsset<UEventEditorSetting>();
                 }
 
                 return Instance;
             }
         }
 
-        protected static EventEditorSetting Instance;
+        protected static UEventEditorSetting Instance;
 
         internal static T FindAsset<T>() where T : Object
         {

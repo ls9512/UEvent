@@ -101,7 +101,7 @@ namespace Aya.Events
             log.Parameters += "]";
             Logs.Add(log);
 
-            if (Logs.Count > EventEditorSetting.Ins.CacheLogCount)
+            if (Logs.Count > UEventEditorSetting.Ins.CacheLogCount)
             {
                 Logs.RemoveAt(0);
             }
@@ -166,7 +166,7 @@ namespace Aya.Events
 
             var stringBuilder = new StringBuilder();
 
-            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeKeyWordColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeKeyWordColor));
             if (methodInfo.IsPrivate)
             {
                 stringBuilder.Append("private ");
@@ -204,26 +204,26 @@ namespace Aya.Events
 
             if (richText) stringBuilder.Append(GetColorMarkupEnd());
 
-            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
             stringBuilder.Append(methodInfo.ReturnType.Name);
             if (richText) stringBuilder.Append(GetColorMarkupEnd());
             stringBuilder.Append(" ");
 
-            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeMethodColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeMethodColor));
             stringBuilder.Append(methodInfo.Name);
             if (richText) stringBuilder.Append(GetColorMarkupEnd());
-            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
             stringBuilder.Append("(");
             if (richText) stringBuilder.Append(GetColorMarkupEnd());
             var parameters = methodInfo.GetParameters();
             for (var i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
+                if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeParameterColor));
                 stringBuilder.Append(parameter.ParameterType.Name);
                 if (richText) stringBuilder.Append(GetColorMarkupEnd());
                 stringBuilder.Append(" ");
-                if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+                if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
                 stringBuilder.Append(parameter.Name);
                 if (i < parameters.Length - 1)
                 {
@@ -233,7 +233,7 @@ namespace Aya.Events
                 if (richText) stringBuilder.Append(GetColorMarkupEnd());
             }
 
-            if (richText) stringBuilder.Append(GetColorMarkupStart(EventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
+            if (richText) stringBuilder.Append(GetColorMarkupStart(UEventEditorSetting.Ins.MonitorStyle.CodeNormalColor));
             stringBuilder.Append(")");
             if (richText) stringBuilder.Append(GetColorMarkupEnd());
             return stringBuilder.ToString();

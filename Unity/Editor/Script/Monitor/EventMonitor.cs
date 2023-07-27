@@ -9,7 +9,6 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +20,6 @@ namespace Aya.Events
       
         public static EventMonitor Instance;
 
-        [MenuItem("Tools/Aya Game/UEvent/Event Monitor", false, 0)]
         public static void ShowWindow()
         {
             if (Instance == null)
@@ -182,17 +180,17 @@ namespace Aya.Events
             var rowColor = GUI.backgroundColor;
             if (eventHandler.IsInvokeSuccess)
             {
-                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipSuccessColor, GUI.backgroundColor, eventHandler.InvokeSuccessProgress);
+                rowColor = Color.Lerp(UEventEditorSetting.Ins.MonitorStyle.TipSuccessColor, GUI.backgroundColor, eventHandler.InvokeSuccessProgress);
             }
 
             if (eventHandler.IsInvokeFail)
             {
-                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipFailColor, GUI.backgroundColor, eventHandler.InvokeFailProgress);
+                rowColor = Color.Lerp(UEventEditorSetting.Ins.MonitorStyle.TipFailColor, GUI.backgroundColor, eventHandler.InvokeFailProgress);
             }
 
             if (eventHandler.IsListening)
             {
-                rowColor = Color.Lerp(EventEditorSetting.Ins.MonitorStyle.TipListenColor, GUI.backgroundColor, eventHandler.ListeningProgress);
+                rowColor = Color.Lerp(UEventEditorSetting.Ins.MonitorStyle.TipListenColor, GUI.backgroundColor, eventHandler.ListeningProgress);
             }
 
             return rowColor;
@@ -349,7 +347,7 @@ namespace Aya.Events
         {
             if (eventHandler.DispatchCounter > 0)
             {
-                GUILayout.Label(eventHandler.LastInvokeDateTime.ToString(EventEditorSetting.Ins.MonitorStyle.DateFormat));
+                GUILayout.Label(eventHandler.LastInvokeDateTime.ToString(UEventEditorSetting.Ins.MonitorStyle.DateFormat));
             }
             else
             {

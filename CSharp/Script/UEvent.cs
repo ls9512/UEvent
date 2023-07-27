@@ -14,6 +14,15 @@ namespace Aya.Events
 {
     public static partial class UEvent
     {
+        #region Register
+      
+        public static void Register(Type objType)
+        {
+            EventListener.Register(objType);
+        } 
+
+        #endregion
+
         #region Listen Action
 
         public static void Listen<T>(Action action, object group = null, int priority = 0, bool interrupt = false)

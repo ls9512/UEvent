@@ -54,7 +54,7 @@ namespace Aya.Events
                         },
                         normal = new GUIStyleState()
                         {
-                            textColor = EventEditorSetting.Ins.MonitorStyle.ActiveUrlColor
+                            textColor = UEventEditorSetting.Ins.MonitorStyle.ActiveUrlColor
                         },
                         alignment = TextAnchor.MiddleLeft,
                         richText = false
